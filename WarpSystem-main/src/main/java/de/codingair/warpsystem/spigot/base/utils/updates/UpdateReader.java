@@ -8,6 +8,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class UpdateReader  {
     public static void start() {
+        if(true) return; //NITRADO-EDITION
+
         Value<BukkitTask> task = new Value<>(null);
         Runnable runnable = () -> {
             WarpSystem.updateAvailable = WarpSystem.getInstance().getUpdateNotifier().read();
