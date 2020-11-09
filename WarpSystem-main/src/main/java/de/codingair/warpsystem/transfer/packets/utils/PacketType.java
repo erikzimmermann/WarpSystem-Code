@@ -67,8 +67,6 @@ public enum PacketType {
     ToggleSetupAssistantPacket(ToggleSetupAssistantPacket.class),
     SetupAssistantStorePacket(SetupAssistantStorePacket.class),
 
-    ApplyUUIDPacket(ApplyUUIDPacket.class),
-
     BooleanPacket(BooleanPacket.class),
     IntegerPacket(IntegerPacket.class),
     LongPacket(LongPacket.class),

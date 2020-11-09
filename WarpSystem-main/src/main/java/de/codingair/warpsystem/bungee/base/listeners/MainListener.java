@@ -8,19 +8,15 @@ import de.codingair.warpsystem.bungee.base.managers.ServerManager;
 import de.codingair.warpsystem.bungee.base.utils.ServerInitializeEvent;
 import de.codingair.warpsystem.bungee.base.utils.ServerProvideOptionsEvent;
 import de.codingair.warpsystem.spigot.base.utils.ServerPing;
-import de.codingair.warpsystem.transfer.packets.bungee.ApplyUUIDPacket;
 import de.codingair.warpsystem.transfer.packets.bungee.PrepareLoginMessagePacket;
+import de.codingair.warpsystem.transfer.packets.bungee.SendUUIDPacket;
 import de.codingair.warpsystem.transfer.packets.general.BooleanPacket;
 import de.codingair.warpsystem.transfer.packets.general.IntegerPacket;
 import de.codingair.warpsystem.transfer.packets.general.PrepareCoordinationTeleportPacket;
 import de.codingair.warpsystem.transfer.packets.general.StringPacket;
-import de.codingair.warpsystem.transfer.packets.spigot.MessagePacket;
-import de.codingair.warpsystem.transfer.packets.spigot.PrepareServerSwitchPacket;
-import de.codingair.warpsystem.transfer.packets.spigot.RequestFullNamePacket;
-import de.codingair.warpsystem.transfer.packets.spigot.RequestServerStatusPacket;
+import de.codingair.warpsystem.transfer.packets.spigot.*;
 import de.codingair.warpsystem.transfer.packets.utils.Packet;
 import de.codingair.warpsystem.transfer.packets.utils.PacketType;
-import de.codingair.warpsystem.transfer.serializeable.ServerOptions;
 import de.codingair.warpsystem.transfer.utils.PacketListener;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
@@ -47,8 +43,6 @@ public class MainListener implements Listener, PacketListener {
             //Update it
             WarpSystem.getInstance().getServerManager().sendInitialPacket(e.getServer().getInfo());
         }
-
-        WarpSystem.getInstance().getDataHandler().send(new ApplyUUIDPacket(e.getPlayer().getName(), e.getPlayer().getUniqueId(), true), e.getServer().getInfo());
 
         if(asking.contains(e.getServer().getInfo())) {
             ask(e.getPlayer());
@@ -101,10 +95,20 @@ public class MainListener implements Listener, PacketListener {
         switch(PacketType.getByObject(packet)) {
             case RequestInitialPacket: {
                 WarpSystem.getInstance().getServerManager().sendInitialPacket(server);
+                break;
+            }
 
-                for(ProxiedPlayer player : server.getPlayers()) {
-                    WarpSystem.getInstance().getDataHandler().send(new ApplyUUIDPacket(player.getName(), player.getUniqueId(), false), server);
-                }
+            case RequestUUIDPacket: {
+                RequestUUIDPacket p = (RequestUUIDPacket) packet;
+                ProxiedPlayer pp = BungeeCord.getInstance().getPlayer(p.getName());
+
+                SendUUIDPacket answer;
+                if(pp == null) answer = new SendUUIDPacket(null);
+                else answer = new SendUUIDPacket(pp.getUniqueId());
+
+                p.applyAsAnswer(answer);
+
+                WarpSystem.getInstance().getDataHandler().send(answer, server);
                 break;
             }
 
