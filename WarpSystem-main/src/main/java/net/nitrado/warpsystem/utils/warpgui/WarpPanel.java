@@ -1,9 +1,12 @@
 package net.nitrado.warpsystem.utils.warpgui;
 
 import de.codingair.codingapi.player.gui.inventory.v2.GUI;
-import de.codingair.codingapi.player.gui.inventory.v2.Page;
+import de.codingair.codingapi.player.gui.inventory.v2.exceptions.AlreadyOpenedException;
+import de.codingair.codingapi.player.gui.inventory.v2.exceptions.IsWaitingException;
+import de.codingair.codingapi.player.gui.inventory.v2.exceptions.NoPageException;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
-import net.nitrado.warpsystem.utils.warpgui.pages.SwitchPage;
+import net.nitrado.warpsystem.utils.warpgui.pages.*;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class WarpPanel extends GUI {
@@ -11,8 +14,18 @@ public class WarpPanel extends GUI {
     public static final String PERMISSION_FULL = "WarpPanel.Full";
 
     public WarpPanel(Player player) {
-        super(player, WarpSystem.getInstance(), 54, COLOR_NITRADO + "Navigation");
+        super(player, WarpSystem.getInstance(), 45, "Navigation");
 
-        registerPage(null, true);
+        BasePage base = new BasePage(this);
+        registerPage(new JnRPage(this, base), false);
+        registerPage(new ServerPage(this, base), false);
+        registerPage(new ArcadePage(this, base), false);
+        registerPage(new SwitchPage(this), true);
+    }
+
+    @Override
+    public void open() throws AlreadyOpenedException, NoPageException, IsWaitingException {
+        super.open();
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 1F);
     }
 }
