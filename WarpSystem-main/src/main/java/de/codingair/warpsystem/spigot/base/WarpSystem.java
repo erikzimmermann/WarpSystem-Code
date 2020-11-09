@@ -251,7 +251,6 @@ public class WarpSystem extends JavaPlugin {
 
             UUIDManager.UUIDListener uuidListener = uuidManager.listener();
             Bukkit.getPluginManager().registerEvents(uuidListener, this);
-            dataHandler.register(uuidListener);
 
             Bukkit.getPluginManager().registerEvents(new HeadListener(), this);
             SetupAssistantListener l = new SetupAssistantListener();
@@ -402,7 +401,6 @@ public class WarpSystem extends JavaPlugin {
         if(this.packetListener != null) this.dataHandler.unregister(this.packetListener);
 
         destroy();
-        this.uuidManager.removeAll();
     }
 
     private boolean checkSpigot() {

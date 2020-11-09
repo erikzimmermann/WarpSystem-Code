@@ -226,7 +226,7 @@ public class SpawnListener implements Listener, PacketListener {
             Player player = Bukkit.getPlayer(p.getPlayer());
             TeleportInfo teleportInfo = new TeleportInfo(w, p.getServer(), p.isByOther());
 
-            if(player == null || !WarpSystem.getInstance().getUUIDManager().isRegistered(player)) teleporting.put(p.getPlayer(), teleportInfo);
+            if(player == null) teleporting.put(p.getPlayer(), teleportInfo);
             else triggerRTP(player, teleportInfo);
         }
     }
