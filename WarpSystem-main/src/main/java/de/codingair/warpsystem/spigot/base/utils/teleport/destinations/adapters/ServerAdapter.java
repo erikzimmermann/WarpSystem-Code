@@ -8,9 +8,6 @@ import de.codingair.warpsystem.spigot.base.utils.teleport.Result;
 import de.codingair.warpsystem.spigot.base.utils.teleport.SimulatedTeleportResult;
 import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.DestinationAdapter;
 import de.codingair.warpsystem.transfer.packets.spigot.PrepareServerSwitchPacket;
-import net.nitrado.misc.MiscPlugin;
-import net.nitrado.warpsystem.utils.Exceptions;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -22,33 +19,21 @@ public class ServerAdapter extends DestinationAdapter {
             return false;
         }
 
-        MiscPlugin misc = (MiscPlugin) Bukkit.getPluginManager().getPlugin("Miscellaneous");
-        misc.getDatabaseManager().setLastLocation(player, new net.nitrado.misc.utils.Callback<Boolean>() {
+        WarpSystem.getInstance().getDataHandler().send(new PrepareServerSwitchPacket(player.getName(), id, message, player.hasPermission(WarpSystem.PERMISSION_ByPass_Teleport_Max_Players), new Callback<Integer>() {
             @Override
-            public void call(Boolean aBoolean) {
-                WarpSystem.getInstance().getDataHandler().send(new PrepareServerSwitchPacket(player.getName(), id, message, player.hasPermission(WarpSystem.PERMISSION_ByPass_Teleport_Max_Players), new Callback<Integer>() {
-                    @Override
-                    public void accept(Integer result) {
-                        if(callback != null) {
-                            if(result == 0) callback.accept(Result.SUCCESS);
-                            else if(result == 1) callback.accept(Result.SERVER_NOT_AVAILABLE);
-                            else if(result == 2) callback.accept(Result.ALREADY_ON_TARGET_SERVER);
-                            else if(result == 3) callback.accept(Result.SERVER_NOT_AVAILABLE);
-                            else if(result == 4) callback.accept(Result.ERROR);
-                            else if(result == 5) callback.accept(Result.TARGET_SERVER_IS_FULL);
-                        }
+            public void accept(Integer result) {
+                if(callback != null) {
+                    if(result == 0) callback.accept(Result.SUCCESS);
+                    else if(result == 1) callback.accept(Result.SERVER_NOT_AVAILABLE);
+                    else if(result == 2) callback.accept(Result.ALREADY_ON_TARGET_SERVER);
+                    else if(result == 3) callback.accept(Result.SERVER_NOT_AVAILABLE);
+                    else if(result == 4) callback.accept(Result.ERROR);
+                    else if(result == 5) callback.accept(Result.TARGET_SERVER_IS_FULL);
+                }
 
-                        if(result == 2) player.sendMessage(Lang.getPrefix() + Lang.get("Player_Is_Already_On_Target_Server"));
-                    }
-                }));
+                if(result == 2) player.sendMessage(Lang.getPrefix() + Lang.get("Player_Is_Already_On_Target_Server"));
             }
-
-            @Override
-            public void exception(Exception e) {
-                e.printStackTrace();
-                player.sendMessage(WarpSystem.PREFIX + "Es ist ein §cFehler §7aufgetreten. §8(" + Exceptions.WARP_1 + ")");
-            }
-        });
+        }));
         return false;
     }
 
@@ -57,7 +42,8 @@ public class ServerAdapter extends DestinationAdapter {
         if(!WarpSystem.getInstance().isOnBungeeCord())
             return new SimulatedTeleportResult(null, Result.NOT_ON_BUNGEE_CORD);
 
-        if(WarpSystem.getInstance().getCurrentServer().equalsIgnoreCase(id)) return new SimulatedTeleportResult(Lang.getPrefix() + Lang.get("Player_Is_Already_On_Target_Server"), Result.ALREADY_ON_TARGET_SERVER);
+        if(WarpSystem.getInstance().getCurrentServer().equalsIgnoreCase(id))
+            return new SimulatedTeleportResult(Lang.getPrefix() + Lang.get("Player_Is_Already_On_Target_Server"), Result.ALREADY_ON_TARGET_SERVER);
         return new SimulatedTeleportResult(null, Result.SUCCESS);
     }
 

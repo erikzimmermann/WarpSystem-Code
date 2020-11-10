@@ -20,6 +20,8 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Content;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -88,8 +90,7 @@ public class Invitation {
                     options.addCallback(new Callback<Result>() {
                         @Override
                         public void accept(Result result) {
-                            if(result == Result.SUCCESS) handle(player.getName(), true);
-                            else handle(player.getName(), false);
+                            handle(player.getName(), result == Result.SUCCESS);
                         }
                     });
 
@@ -256,11 +257,11 @@ public class Invitation {
             m.setTimeOut(TeleportCommandManager.getInstance().getExpireDelay());
 
             TextComponent accept = new TextComponent(Lang.get("Accept"));
-            accept.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {new TextComponent(Lang.get("Click_Hover"))}));
+            accept.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Lang.get("Click_Hover"))));
             accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + sender));
 
             TextComponent deny = new TextComponent(Lang.get("Deny"));
-            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {new TextComponent(Lang.get("Click_Hover"))}));
+            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Lang.get("Click_Hover"))));
             deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tpdeny " + sender));
 
             m.replace("%ACCEPT%", accept);

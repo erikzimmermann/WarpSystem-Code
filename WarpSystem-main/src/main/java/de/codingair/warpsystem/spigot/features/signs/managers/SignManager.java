@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Sign;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ import java.util.Map;
 @Function(name = "Enabled", defaultValue = "true", config = "Config", configPath = "WarpSystem.Functions.WarpSigns", clazz = Boolean.class)
 @Function(name = "Teleport message", defaultValue = "true", config = "Config", configPath = "WarpSystem.Send.Teleport_Message.WarpSigns", clazz = Boolean.class)
 public class SignManager implements Manager {
-    private final List<WarpSign> warpSigns = new ArrayList<>();
+    private final HashMap<Location, WarpSign> warpSigns = new HashMap<>();
 
     public static SignManager getInstance() {
         return WarpSystem.getInstance().getDataManager().getManager(FeatureType.SIGNS);
@@ -49,16 +50,19 @@ public class SignManager implements Manager {
                     } catch(Exception e) {
                         e.printStackTrace();
                         success = false;
+                        continue;
                     }
                 } else if(s instanceof String) {
                     try {
                         warpSign.read((JSON) new JSONParser().parse((String) s));
                     } catch(Exception e) {
                         e.printStackTrace();
+                        continue;
                     }
                 }
 
-                this.warpSigns.add(warpSign);
+                addWarpSign(warpSign);
+                warpSign.update();
             }
         }
 
@@ -76,7 +80,7 @@ public class SignManager implements Manager {
         if(!saver) WarpSystem.log("  > Saving WarpSigns");
 
         List<JSON> data = new ArrayList<>();
-        for(WarpSign s : this.warpSigns) {
+        for(WarpSign s : this.warpSigns.values()) {
             JSON json = new JSON();
             s.write(json);
             data.add(json);
@@ -94,19 +98,30 @@ public class SignManager implements Manager {
     }
 
     public void updateAll() {
-        warpSigns.stream().filter(s -> !s.isEditing()).forEach(WarpSign::update);
+        warpSigns.values().stream().filter(s -> !s.isEditing()).forEach(WarpSign::update);
+    }
+
+    private Location trimLocation(Location location) {
+        if(location instanceof de.codingair.codingapi.tools.Location) return new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        location.setX(location.getBlockX());
+        location.setY(location.getBlockY());
+        location.setZ(location.getBlockZ());
+        location.setYaw(0);
+        location.setPitch(0);
+        return location;
     }
 
     public WarpSign getByLocation(Location location) {
-        for(WarpSign warpSign : this.warpSigns) {
-            if(warpSign.getLocation().getWorld() == null) continue;
-            if(warpSign.getLocation().getBlock().getLocation().equals(location.getBlock().getLocation())) return warpSign;
-        }
-
-        return null;
+        return this.warpSigns.get(trimLocation(location));
     }
 
-    public List<WarpSign> getWarpSigns() {
-        return warpSigns;
+    public void removeWarpSign(WarpSign sign) {
+        sign = this.warpSigns.remove(sign.getLocation());
+        if(sign != null) sign.destroy();
+    }
+
+    public void addWarpSign(WarpSign sign) {
+        this.warpSigns.put(trimLocation(sign.getLocation()), sign);
     }
 }

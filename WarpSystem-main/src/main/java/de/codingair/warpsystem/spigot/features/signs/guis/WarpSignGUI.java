@@ -29,7 +29,7 @@ public class WarpSignGUI extends Editor<WarpSign> {
                         sign.apply(clone);
 
                         if(SignManager.getInstance().getByLocation(sign.getLocation()) == null) {
-                            SignManager.getInstance().getWarpSigns().add(sign);
+                            SignManager.getInstance().addWarpSign(sign);
                         }
 
                         Sign s = (Sign) sign.getLocation().getBlock().getState();

@@ -3,9 +3,7 @@ package de.codingair.warpsystem.spigot.features.signs.utils;
 import de.codingair.codingapi.tools.Location;
 import de.codingair.codingapi.tools.io.lib.JSONArray;
 import de.codingair.codingapi.tools.io.utils.DataWriter;
-import de.codingair.codingapi.utils.ChatColor;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
-import de.codingair.warpsystem.spigot.base.utils.ServerPing;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.FeatureObject;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.types.WarpAction;
 import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.Destination;
@@ -155,6 +153,12 @@ public class WarpSign extends FeatureObject {
 
     public WarpSign clone() {
         return new WarpSign(this);
+    }
+
+    public WarpSign cloneAt(Location location) {
+        WarpSign sign = new WarpSign(this);
+        sign.location = location;
+        return sign;
     }
 
     public String[] getText() {

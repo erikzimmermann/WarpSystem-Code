@@ -4,5 +4,4 @@ version: "${project.version}"
 description: WarpSystem
 main: de.codingair.warpsystem.spigot.base.WarpSystem
 softdepend: [Multiverse-Core, Vault, Essentials, MultiWorld, PlaceholderAPI, PlayerPoints, GemsEconomy]
-depend: [Miscellaneous]
 api-version: "1.13"

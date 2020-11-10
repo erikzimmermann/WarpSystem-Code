@@ -106,8 +106,8 @@
             <version>2.1.4</version>
         </dependency>
         <dependency>
-            <groupId>de.codingair</groupId>
-            <artifactId>codingapi</artifactId>
+            <groupId>com.github.CodingAir</groupId>
+            <artifactId>CodingAPI</artifactId>
             <version>1.6</version>
         </dependency>
         <dependency>
