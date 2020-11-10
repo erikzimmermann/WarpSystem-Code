@@ -28,17 +28,7 @@ public class PanelButton extends Button {
 
     private final ServerPing ping;
     private final Destination destination;
-
-    public PanelButton(String name, Material material, int id, String server, Player player) {
-        this.name = name;
-        this.material = material;
-        this.skull = null;
-        this.id = id;
-        this.player = player;
-
-        this.ping = WarpSystem.getInstance().getServerManager().getProperties(server);
-        this.destination = new Destination(server, DestinationType.Server);
-    }
+    private boolean joined = false;
 
     public PanelButton(String name, String skull, int id, String server, Player player) {
         this.name = name;
@@ -49,6 +39,8 @@ public class PanelButton extends Button {
 
         this.ping = WarpSystem.getInstance().getServerManager().getProperties(server);
         this.destination = new Destination(server, DestinationType.Server);
+
+        joined = server.equalsIgnoreCase(WarpSystem.getInstance().getCurrentServer());
     }
 
     @Override
@@ -70,7 +62,8 @@ public class PanelButton extends Button {
             item.addLore("§7Status: §aOnline");
             item.addLore("§7Spieler: " + (isFull(ping) ? "§c" : "§a") + ping.getPlayers() + "§8/§770");
 
-            item.addLore("", "§7» Server wechseln");
+            if(joined) item.addLore("", "§7» Bereits beigetreten");
+            else item.addLore("", "§7» Server wechseln");
         }
 
         return item.getItem();
@@ -78,7 +71,7 @@ public class PanelButton extends Button {
 
     @Override
     public boolean canClick(ClickType type) {
-        return type == ClickType.LEFT && ping != null && (!isFull(ping) || player.hasPermission(WarpPanel.PERMISSION_FULL));
+        return type == ClickType.LEFT && !joined && ping != null && (!isFull(ping) || player.hasPermission(WarpPanel.PERMISSION_FULL));
     }
 
     @Override
@@ -110,6 +103,7 @@ public class PanelButton extends Button {
     }
 
     public static boolean isFull(ServerPing ping) {
+        if(ping == null) return true;
         return ping.getPlayers() >= 70;
     }
 }

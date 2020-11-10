@@ -46,21 +46,21 @@ public class ServerPage extends Page {
     public void buildItems() {
         int id = 0;
         for(int i = 0; i < 3; i++) {
-            addButton(3 + i, 0, new PanelButton("Event", SKULLS[id++], id, "event" + id, gui.getPlayer()));
+            addButton(3 + i, 0, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
         }
 
         for(int j = 0; j < 3; j++) {
             for(int i = 0; i < 5; i++) {
-                addButton(2 + i, 1 + j, new PanelButton("Event", SKULLS[id++], id, "event" + id, gui.getPlayer()));
+                addButton(2 + i, 1 + j, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
             }
         }
 
         for(int i = 0; i < 3; i++) {
-            addButton(3 + i, 4, new PanelButton("Event", SKULLS[id++], id, "event" + id, gui.getPlayer()));
+            addButton(3 + i, 4, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
         }
 
         String server = WarpSystem.getInstance().getCurrentServer();
-        String name = server.split("[0-9]]", -1)[0];
+        String name = server.split("[0-9]", -1)[0];
         server = name + " " + server.replace(name, "");
         server = server.substring(0, 1).toUpperCase() + server.substring(1).toLowerCase();
         String finalServer = server;
@@ -69,7 +69,7 @@ public class ServerPage extends Page {
         addButton(8, 2, new Button() {
             @Override
             public ItemStack buildItem() {
-                return new ItemBuilder(QUESTION).setName("§7Du bist hier: §e" + finalServer).addLore("§7Status: §aOnline").addLore("§7Spieler: " + (PanelButton.isFull(ping) ? "§c" : "§a") + ping.getPlayers() + "§8/§770").getItem();
+                return new ItemBuilder(QUESTION).setName("§7Du bist hier: §e" + finalServer).addLore("§7Status: §aOnline").addLore("§7Spieler: " + (ping == null ? "§7?" : ((PanelButton.isFull(ping) ? "§c" : "§a") + ping.getPlayers())) + "§8/§770").getItem();
             }
 
             @Override
