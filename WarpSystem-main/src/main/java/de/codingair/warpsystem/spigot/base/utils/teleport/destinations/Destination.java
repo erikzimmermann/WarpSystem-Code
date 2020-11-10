@@ -118,8 +118,9 @@ public class Destination implements Serializable {
     }
 
     public void sendMessage(Player player, String message, String displayName, double costs) {
+        message = getMessage(player, message, displayName, costs);
         if(adapter == null || message == null || !customOptions.sendMessage() || type == DestinationType.GlobalWarp) return;
-        player.sendMessage(getMessage(player, message, displayName, costs));
+        player.sendMessage(message);
     }
 
     public String getMessage(Player player, String message, String displayName, double costs) {
