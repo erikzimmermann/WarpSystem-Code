@@ -95,7 +95,7 @@ public class PanelButton extends Button {
                         break;
 
                     case ERROR:
-                        p.sendMessage(WarpSystem.PREFIX + "Es ist ein §cFehler §7aufgetreten. §8(" + Exceptions.WARP_2 + ")");
+                        p.sendMessage(WarpPanel.PREFIX + "Es ist ein §cFehler §7aufgetreten. §8(" + Exceptions.WARP_2 + ")");
                         break;
                 }
             }

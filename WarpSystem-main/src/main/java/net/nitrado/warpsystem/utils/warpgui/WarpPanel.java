@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 public class WarpPanel extends GUI {
     public static final String COLOR_NITRADO = "§x§F§F§D§7§4§4"; //#FFD744
     public static final String PERMISSION_FULL = "WarpPanel.Full";
+    public static final String PREFIX = COLOR_NITRADO + "Parkour §8» §7";
 
     public WarpPanel(Player player) {
         super(player, WarpSystem.getInstance(), 45, "Navigation");

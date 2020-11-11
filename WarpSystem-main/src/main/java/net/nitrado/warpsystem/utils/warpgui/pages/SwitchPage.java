@@ -32,7 +32,7 @@ public class SwitchPage extends Page {
                 ItemBuilder builder = new ItemBuilder();
 
                 builder.setType(Material.LADDER);
-                builder.setName("§3§lJump 'n' Runs");
+                builder.setName("§3§lJump & Runs");
                 builder.addLore("", "§7» Kategorie öffnen");
 
                 return builder.getItem();
