@@ -20,7 +20,7 @@ public class ArcadePage extends Page {
 
     public ArcadePage(GUI gui, Page basic) {
         super(gui, basic);
-        setTitle("Navigation - §c§lMinigames");
+        setTitle("Teleporter - §c§lMinigames");
 
         bb = new TeleportOptions(new Destination("bb", DestinationType.SimpleWarp), "");
         ffa = new TeleportOptions(new Destination("ffa", DestinationType.SimpleWarp), "");

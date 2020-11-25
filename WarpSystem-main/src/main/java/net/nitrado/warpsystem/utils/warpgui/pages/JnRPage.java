@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 public class JnRPage extends Page {
     public JnRPage(GUI gui, Page basic) {
         super(gui, basic);
-        setTitle("Navigation - §3§lJump & Runs");
+        setTitle("Teleporter - §3§lJump & Runs");
     }
 
     @Override

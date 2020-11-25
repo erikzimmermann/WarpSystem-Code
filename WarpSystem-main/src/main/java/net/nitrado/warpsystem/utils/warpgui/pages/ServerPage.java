@@ -39,7 +39,7 @@ public class ServerPage extends Page {
 
     public ServerPage(GUI gui, Page basic) {
         super(gui, basic);
-        setTitle("Navigation - §5§lEvent Server");
+        setTitle("Teleporter - §5§lEvent Server");
     }
 
     @Override
