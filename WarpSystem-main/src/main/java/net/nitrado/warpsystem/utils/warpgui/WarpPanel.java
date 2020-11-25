@@ -15,7 +15,7 @@ public class WarpPanel extends GUI {
     public static final String PREFIX = COLOR_NITRADO + "Parkour §8» §7";
 
     public WarpPanel(Player player) {
-        super(player, WarpSystem.getInstance(), 45, "Navigation");
+        super(player, WarpSystem.getInstance(), 45, "Magischer Teleporter");
 
         BasePage base = new BasePage(this);
         registerPage(new JnRPage(this, base), false);
