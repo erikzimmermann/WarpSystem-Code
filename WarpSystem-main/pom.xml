@@ -6,7 +6,7 @@
 
     <groupId>de.codingair</groupId>
     <artifactId>WarpSystem-main</artifactId>
-    <version>4.2.11-nitrado-2</version>
+    <version>4.2.11-nitrado-3</version>
 
     <repositories>
         <repository>
