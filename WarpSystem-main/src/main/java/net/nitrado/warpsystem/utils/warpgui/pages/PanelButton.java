@@ -9,7 +9,6 @@ import de.codingair.warpsystem.spigot.base.utils.ServerPing;
 import de.codingair.warpsystem.spigot.base.utils.teleport.Result;
 import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.Destination;
 import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.DestinationType;
-import net.minecraft.server.v1_16_R1.Container;
 import net.nitrado.warpsystem.utils.Exceptions;
 import net.nitrado.warpsystem.utils.warpgui.WarpPanel;
 import org.bukkit.Material;
@@ -57,13 +56,18 @@ public class PanelButton extends Button {
             item.setHideEnchantments(true);
         }
 
-        if(ping == null) item.addLore("§7Status: §cOffline");
+        if(ping == null || !ping.getStatus()) item.addLore("§7Status: §cOffline");
         else {
             item.addLore("§7Status: §aOnline");
             item.addLore("§7Spieler: " + (isFull(ping) ? "§c" : "§a") + ping.getPlayers() + "§8/§770");
 
             if(joined) item.addLore("", "§7» Bereits beigetreten");
-            else item.addLore("", "§7» Server wechseln");
+            else {
+                if(id >= 21) {
+                    if(this.player.hasPermission("group.partner")) item.addLore("", "§7» Speziell für dich");
+                    else item.addLore("", "§7» Für die " + WarpPanel.COLOR_NITRADO + "#NitradoFamily");
+                } else item.addLore("", "§7» Server wechseln");
+            }
         }
 
         return item.getItem();
@@ -71,6 +75,8 @@ public class PanelButton extends Button {
 
     @Override
     public boolean canClick(ClickType type) {
+        if(id >= 21 && !player.hasPermission("group.partner")) return false;
+
         return type == ClickType.LEFT && !joined && ping != null && (!isFull(ping) || player.hasPermission(WarpPanel.PERMISSION_FULL));
     }
 
@@ -78,7 +84,7 @@ public class PanelButton extends Button {
     public void onClick(GUI gui, InventoryClickEvent e) {
         Player p = gui.getPlayer();
 
-        destination.teleport(p, WarpPanel.COLOR_NITRADO + "Nitrado §8» §7Du wurdest zu §eEvent-" + id + "§7 teleportiert.", "", false, false, 0, new Callback<Result>() {
+        destination.teleport(p, WarpPanel.COLOR_NITRADO + "Nitrado §8» §7Du wurdest zu §eEvent-" + (id < 10 ? "0" + id : id) + "§7 teleportiert.", "", false, false, 0, new Callback<Result>() {
             @Override
             public void accept(Result result) {
                 switch(result) {
