@@ -1,6 +1,5 @@
 package de.codingair.warpsystem.spigot.features.warps.nextlevel.utils;
 
-import de.codingair.codingapi.server.Color;
 import de.codingair.codingapi.tools.Call;
 import de.codingair.codingapi.tools.Callback;
 import de.codingair.codingapi.tools.io.utils.DataWriter;
@@ -15,8 +14,6 @@ import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.ActionOb
 import de.codingair.warpsystem.spigot.base.utils.money.Bank;
 import de.codingair.warpsystem.spigot.base.utils.teleport.Result;
 import de.codingair.warpsystem.spigot.features.warps.managers.IconManager;
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -210,7 +207,7 @@ public class Icon extends FeatureObject {
     }
 
     public String getNameWithoutColor() {
-        return name == null ? null : Color.removeColor(Color.translateAlternateColorCodes('&', name));
+        return name == null ? null : ChatColor.stripColor(ChatColor.translateAll('&', name));
     }
 
     public ItemStack getRaw() {

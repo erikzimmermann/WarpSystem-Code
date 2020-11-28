@@ -1,6 +1,5 @@
 package de.codingair.warpsystem.spigot.features.warps.guis.editor.pages.utils;
 
-import de.codingair.codingapi.server.Color;
 import de.codingair.codingapi.tools.items.ItemBuilder;
 import de.codingair.codingapi.tools.items.XMaterial;
 import de.codingair.codingapi.utils.ChatColor;
@@ -57,7 +56,7 @@ public abstract class NameButton extends de.codingair.warpsystem.spigot.base.gui
     public String acceptName(String name) {
         if(name == null) return null;
 
-        name = Color.removeColor(Color.translateAlternateColorCodes('&', name));
+        name = ChatColor.stripColor(ChatColor.translateAll('&', name));
         if(startName != null && startName.equalsIgnoreCase(name)) return null;
 
         if(icon.isPage()) {

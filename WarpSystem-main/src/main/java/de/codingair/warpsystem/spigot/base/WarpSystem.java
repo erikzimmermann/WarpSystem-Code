@@ -198,7 +198,7 @@ public class WarpSystem extends JavaPlugin {
             log("Status:");
             log(" ");
             log("MC-Version: " + Version.get().fullVersion());
-            log(" ");;
+            log(" ");
 
             this.fileManager.loadFile("Config", "/");
             Lang.initPreDefinedLanguages(this);

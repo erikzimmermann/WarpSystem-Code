@@ -38,7 +38,7 @@ public class VanishManager implements PacketListener, Listener {
         List<String> l = new ArrayList<>(vanished);
         for(String s : l) {
             ProxiedPlayer p = BungeeCord.getInstance().getPlayer(s);
-            if(p == null) vanished.remove(s);
+            if(p == null || p.getServer() == null) vanished.remove(s);
             else if(p.getServer().getInfo().equals(e.getInfo())) vanished.remove(s);
         }
         l.clear();

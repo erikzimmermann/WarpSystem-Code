@@ -98,9 +98,23 @@ public class WarpSign extends FeatureObject {
         }
 
         List<String> text = d.getList("text");
-        if(text == null) this.text = ((Sign) (location.getBlock().getState())).getLines();
+        if(text == null || text.isEmpty()) this.text = ((Sign) (location.getBlock().getState())).getLines();
         else this.text = text.toArray(new String[4]);
+        repairLines();
+
         return true;
+    }
+
+    private void repairLines() {
+        int empty = 0;
+
+        for(String s : this.text) {
+            if(s == null || s.isEmpty()) empty++;
+        }
+
+        if(empty == 4) {
+            this.text = ((Sign) (location.getBlock().getState())).getLines();
+        }
     }
 
     @Override

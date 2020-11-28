@@ -20,11 +20,12 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class ServerManager implements Listener, PacketListener {
     private final HashMap<ServerInfo, ServerOptions> options = new HashMap<>();
-    private final HashMap<String, ServerPing> cachedPing = new HashMap<>();
+    private final ConcurrentHashMap<String, ServerPing> cachedPing = new ConcurrentHashMap<>();
     private final Set<ServerInfo> onlineServer = new HashSet<>();
     private final HashMap<ServerInfo, List<Callback<ServerInfo>>> waiting = new HashMap<>();
 
@@ -64,46 +65,38 @@ public class ServerManager implements Listener, PacketListener {
                 info.ping((serverPing, error) -> {
                     setStatus(info, error == null);
 
-                    useCache(new Callback<HashMap<String, ServerPing>>() {
-                        @Override
-                        public void accept(HashMap<String, ServerPing> cachedPing) {
-                            ServerPing ping = cachedPing.get(info.getName().toLowerCase());
-
-                            if(error == null) {
-                                ping.setStatus(true);
-                                ping.setPlayers(serverPing.getPlayers().getOnline());
-                                ping.setMaxPlayers(serverPing.getPlayers().getMax());
-                                ping.setMotd(info.getMotd());
-                            } else {
-                                ping.setStatus(false);
-                                ping.setPlayers(0);
-                                ping.setMaxPlayers(0);
-                                ping.setMotd(null);
-                            }
+                    cachedPing.compute(info.getName().toLowerCase(), (name, ping) -> {
+                        if(error == null) {
+                            ping.setStatus(true);
+                            ping.setPlayers(serverPing.getPlayers().getOnline());
+                            ping.setMaxPlayers(serverPing.getPlayers().getMax());
+                            ping.setMotd(info.getMotd());
+                        } else {
+                            ping.setStatus(false);
+                            ping.setPlayers(0);
+                            ping.setMaxPlayers(0);
+                            ping.setMotd(null);
                         }
+
+                        return ping;
                     });
                 });
             }
         }, 0, 5, TimeUnit.SECONDS);
 
         BungeeCord.getInstance().getScheduler().schedule(WarpSystem.getInstance(), () -> {
-            useCache(new Callback<HashMap<String, ServerPing>>() {
-                @Override
-                public void accept(HashMap<String, ServerPing> object) {
-                    SendServerPropertiesPacket p = new SendServerPropertiesPacket(cachedPing);
+            HashMap<String, ServerPing> copy = new HashMap<>();
+            for(Map.Entry<String, ServerPing> e : cachedPing.entrySet()) {
+                copy.put(e.getKey(), new ServerPing(e.getValue()));
+            }
 
-                    for(ServerInfo target : BungeeCord.getInstance().getServers().values()) {
-                        if(!target.getPlayers().isEmpty()) {
-                            WarpSystem.getInstance().getDataHandler().send(p, target);
-                        }
-                    }
+            SendServerPropertiesPacket p = new SendServerPropertiesPacket(copy);
+            for(ServerInfo target : BungeeCord.getInstance().getServers().values()) {
+                if(!target.getPlayers().isEmpty()) {
+                    WarpSystem.getInstance().getDataHandler().send(p, target);
                 }
-            });
+            }
         }, 3, 5, TimeUnit.SECONDS);
-    }
-
-    private synchronized void useCache(Callback<HashMap<String, ServerPing>> callback) {
-        callback.accept(cachedPing);
     }
 
     public void sendInitialPacket(ServerInfo server) {
@@ -117,11 +110,11 @@ public class ServerManager implements Listener, PacketListener {
         }
     }
 
-    public void setStatus(ServerInfo info, boolean online) {
+    public synchronized void setStatus(ServerInfo info, boolean online) {
         if(!online) {
             this.onlineServer.remove(info);
             TeleportManager.getInstance().removeOptions(info);
-            options.remove(info);
+            this.options.remove(info);
         } else this.onlineServer.add(info);
     }
 

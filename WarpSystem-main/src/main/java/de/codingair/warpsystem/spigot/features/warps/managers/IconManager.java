@@ -1,7 +1,6 @@
 package de.codingair.warpsystem.spigot.features.warps.managers;
 
 import de.codingair.codingapi.files.ConfigFile;
-import de.codingair.codingapi.server.Color;
 import de.codingair.codingapi.tools.io.ConfigWriter;
 import de.codingair.codingapi.tools.io.JSON.JSON;
 import de.codingair.codingapi.tools.io.JSON.JSONParser;
@@ -24,6 +23,7 @@ import de.codingair.warpsystem.spigot.features.warps.importfilter.WarpData;
 import de.codingair.warpsystem.spigot.features.warps.nextlevel.exceptions.IconReadException;
 import de.codingair.warpsystem.spigot.features.warps.nextlevel.utils.Icon;
 import de.codingair.warpsystem.utils.Manager;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -352,7 +352,7 @@ public class IconManager implements Manager {
 
     public Icon getPage(String name) {
         if(name == null) return null;
-        name = Color.removeColor(Color.translateAlternateColorCodes('&', name));
+        name = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name));
 
         for(Icon icon : this.icons) {
             if(!icon.isPage()) continue;
@@ -364,7 +364,7 @@ public class IconManager implements Manager {
 
     public Icon getIcon(String name) {
         if(name == null) return null;
-        name = Color.removeColor(Color.translateAlternateColorCodes('&', name));
+        name = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name));
 
         for(Icon icon : this.icons) {
             if(icon.isPage() || icon.getName() == null) continue;

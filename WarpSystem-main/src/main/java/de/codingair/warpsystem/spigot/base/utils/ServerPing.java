@@ -1,6 +1,5 @@
 package de.codingair.warpsystem.spigot.base.utils;
 
-import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.transfer.serializeable.Serializable;
 
 import java.io.DataInputStream;
@@ -14,6 +13,13 @@ public class ServerPing implements Serializable {
     private String motd;
 
     public ServerPing() {
+    }
+
+    public ServerPing(ServerPing ping) {
+        this.status = ping.status;
+        this.players = ping.players;
+        this.maxPlayers = ping.maxPlayers;
+        this.motd = ping.motd;
     }
 
     public ServerPing(boolean status, int players, int maxPlayers, String motd) {
