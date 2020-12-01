@@ -1,5 +1,6 @@
 package de.codingair.warpsystem.spigot.base.managers;
 
+import de.codingair.codingapi.API;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.transfer.packets.spigot.utils.ServerPing;
 import de.codingair.warpsystem.spigot.features.FeatureType;
@@ -8,6 +9,7 @@ import de.codingair.warpsystem.transfer.packets.bungee.SendServerPropertiesPacke
 import de.codingair.warpsystem.transfer.packets.utils.Packet;
 import de.codingair.warpsystem.transfer.packets.utils.PacketType;
 import de.codingair.warpsystem.transfer.utils.PacketListener;
+import net.nitrado.warpsystem.utils.warpgui.WarpPanel;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
@@ -37,6 +39,11 @@ public class ServerManager extends PacketListener {
     public void onUpdate() {
         Bukkit.getScheduler().runTask(WarpSystem.getInstance(), () -> {
             if(FeatureType.SIGNS.isActive()) SignManager.getInstance().updateAll();
+
+            //NITRADO
+            for(WarpPanel panel : API.getRemovables(WarpPanel.class)) {
+                panel.getActive().updateItems(false);
+            }
         });
     }
 
