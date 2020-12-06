@@ -46,6 +46,7 @@ public class ServerAdapter extends DestinationAdapter {
 
             @Override
             public void exception(Exception e) {
+                if(callback != null) callback.accept(Result.ERROR);
                 e.printStackTrace();
                 player.sendMessage(WarpPanel.PREFIX + "Es ist ein §cFehler §7aufgetreten. §8(" + Exceptions.WARP_1 + ")");
             }

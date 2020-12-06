@@ -30,7 +30,7 @@ public class SpigotHandler extends SpigotDataHandler {
     }
 
     public void send(de.codingair.warpsystem.base.transfer.packets.utils.Packet packet) {
-        super.send((Packet) packet);
+        this.send((Packet) packet, -1);
     }
 
     public void unregister(de.codingair.warpsystem.base.transfer.utils.PacketListener listener) {
