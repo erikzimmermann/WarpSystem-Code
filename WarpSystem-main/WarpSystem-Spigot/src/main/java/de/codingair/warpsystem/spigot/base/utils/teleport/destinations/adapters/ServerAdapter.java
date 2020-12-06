@@ -25,7 +25,6 @@ public class ServerAdapter extends DestinationAdapter {
                 if(callback != null) {
                     if(result == 0) callback.accept(Result.SUCCESS);
                     else {
-                        player.sendMessage("[WS-DEBUG] result: " + result);
                         if(result == 1) callback.accept(Result.SERVER_NOT_AVAILABLE);
                         else if(result == 2) callback.accept(Result.ALREADY_ON_TARGET_SERVER);
                         else if(result == 3) callback.accept(Result.SERVER_NOT_AVAILABLE);

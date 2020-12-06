@@ -5,7 +5,7 @@
     <parent>
         <artifactId>WarpSystem-main</artifactId>
         <groupId>de.codingair</groupId>
-        <version>4.2.12</version>
+        <version>4.2.12-nitrado</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
