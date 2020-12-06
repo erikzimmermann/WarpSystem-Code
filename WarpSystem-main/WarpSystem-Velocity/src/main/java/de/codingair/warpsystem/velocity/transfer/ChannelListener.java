@@ -26,8 +26,6 @@ public class ChannelListener {
 
             try {
                 ServerConnection s = (ServerConnection) e.getSource();
-
-                if(!in.readUTF().equals(velocityDataHandler.getRequestChannel())) return;
                 Packet packet = velocityDataHandler.produce(in.readUnsignedShort());
 
                 if(packet == null) return;

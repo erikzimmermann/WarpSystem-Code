@@ -63,7 +63,6 @@ public class SpigotHandler extends SpigotDataHandler {
             }
 
             try {
-                out.writeUTF(requestChannel);
                 out.writeShort(id);
                 packet.write(out);
             } catch(IOException e) {

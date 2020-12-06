@@ -40,6 +40,7 @@ public class GlobalWarpManager implements Manager, BungeeFeature {
     }
 
     public void delete(String warpName, Callback<Boolean> callback) {
+        if(warpName == null) return;
         WarpSystem.getInstance().getDataHandler().send(new DeleteGlobalWarpPacket(warpName, callback));
     }
 
