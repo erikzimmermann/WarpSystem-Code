@@ -33,7 +33,7 @@ public class SignListener implements Listener {
         manager = WarpSystem.getInstance().getDataManager().getManager(FeatureType.SIGNS);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent e) {
         if(!e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
 
