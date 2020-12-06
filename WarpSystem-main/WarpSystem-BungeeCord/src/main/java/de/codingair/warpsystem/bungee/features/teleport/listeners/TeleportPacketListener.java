@@ -2,9 +2,6 @@ package de.codingair.warpsystem.bungee.features.teleport.listeners;
 
 import de.codingair.codingapi.tools.Callback;
 import de.codingair.codingapi.utils.Value;
-import de.codingair.warpsystem.bungee.api.Players;
-import de.codingair.warpsystem.bungee.base.WarpSystem;
-import de.codingair.warpsystem.bungee.features.teleport.managers.TeleportManager;
 import de.codingair.warpsystem.base.transfer.packets.bungee.TeleportPlayerToCoordsPacket;
 import de.codingair.warpsystem.base.transfer.packets.bungee.TeleportPlayerToPlayerPacket;
 import de.codingair.warpsystem.base.transfer.packets.general.IntegerPacket;
@@ -14,6 +11,9 @@ import de.codingair.warpsystem.base.transfer.packets.spigot.*;
 import de.codingair.warpsystem.base.transfer.packets.utils.Packet;
 import de.codingair.warpsystem.base.transfer.packets.utils.PacketType;
 import de.codingair.warpsystem.base.transfer.utils.PacketListener;
+import de.codingair.warpsystem.bungee.api.Players;
+import de.codingair.warpsystem.bungee.base.WarpSystem;
+import de.codingair.warpsystem.bungee.features.teleport.managers.TeleportManager;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -80,12 +80,12 @@ public class TeleportPacketListener extends PacketListener {
 
             if(recipient == null) {
                 //forward to all
-                int servers = WarpSystem.getInstance().getServerManager().getOnlineServer().size() - 1;
+                int servers = (int) (WarpSystem.getInstance().getServerManager().getOnlineServer().count() - 1);
                 Value<Integer> handled = new Value<>(0);
                 Value<Long> generalResult = new Value<>(0L);
 
-                for(ServerInfo s : WarpSystem.getInstance().getServerManager().getOnlineServer()) {
-                    if(s.getName().equalsIgnoreCase(extra) || !TeleportManager.getInstance().isAccessible(s)) continue;
+                WarpSystem.getInstance().getServerManager().getOnlineServer().forEach(s -> {
+                    if(s.getName().equalsIgnoreCase(extra) || !TeleportManager.getInstance().isAccessible(s)) return;
 
                     WarpSystem.getInstance().getDataHandler().send(new PrepareTeleportRequestPacket(new Callback<Long>() {
                         @Override
@@ -100,7 +100,7 @@ public class TeleportPacketListener extends PacketListener {
                             }
                         }
                     }, tpPacket.getSender(), null, true), s);
-                }
+                });
             } else {
                 //only recipient
                 ProxiedPlayer player = Players.getPlayer(tpPacket.getRecipient());
@@ -145,26 +145,26 @@ public class TeleportPacketListener extends PacketListener {
             String recipient = tpPacket.getRecipient();
             if(recipient == null) {
                 //forward to all
-                int handled = 0;
-                int sent = 0;
+                Value<Integer> handled = new Value<>(0);
+                Value<Integer> sent = new Value<>(0);
 
-                for(ServerInfo s : WarpSystem.getInstance().getServerManager().getOnlineServer()) {
-                    if(s.getName().equalsIgnoreCase(extra)) continue;
-                    handled += s.getPlayers().size();
-                    if(!TeleportManager.getInstance().isAccessible(s)) continue;
+                WarpSystem.getInstance().getServerManager().getOnlineServer().forEach(s -> {
+                    if(s.getName().equalsIgnoreCase(extra)) return;
+                    handled.setValue(handled.getValue() + s.getPlayers().size());
+                    if(!TeleportManager.getInstance().isAccessible(s)) return;
 
                     //tp all
                     for(ProxiedPlayer player : s.getPlayers()) {
-                        if(TeleportManager.getInstance().deniesForceTps(player)) continue;
+                        if(TeleportManager.getInstance().deniesForceTps(player)) return;
 
-                        sent++;
+                        sent.setValue(sent.getValue() + 1);
                         TeleportPlayerToPlayerPacket ptpPacket = new TeleportPlayerToPlayerPacket(tpPacket.getSender(), player.getName(), targetPlayer.getName(), false);
                         WarpSystem.getInstance().getDataHandler().send(ptpPacket, target);
                         player.connect(target);
                     }
-                }
+                });
 
-                LongPacket answer = new LongPacket((((long) handled) << 32) | (sent & 0xffffffffL));
+                LongPacket answer = new LongPacket((((long) handled.getValue()) << 32) | (sent.getValue() & 0xffffffffL));
                 tpPacket.applyAsAnswer(answer);
                 WarpSystem.getInstance().getDataHandler().send(answer, origin);
             } else {

@@ -16,10 +16,17 @@ public class ServerPing implements Serializable {
     }
 
     public ServerPing(ServerPing ping) {
-        this.status = ping.status;
-        this.players = ping.players;
-        this.maxPlayers = ping.maxPlayers;
-        this.motd = ping.motd;
+        if(ping == null) {
+            this.status = false;
+            this.players = 0;
+            this.maxPlayers = 0;
+            this.motd = null;
+        } else {
+            this.status = ping.status;
+            this.players = ping.players;
+            this.maxPlayers = ping.maxPlayers;
+            this.motd = ping.motd;
+        }
     }
 
     public ServerPing(boolean status, int players, int maxPlayers, String motd) {

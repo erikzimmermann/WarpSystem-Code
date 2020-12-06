@@ -53,10 +53,10 @@ public class SpawnManager implements Manager {
     }
 
     public void synchronize(ServerInfo except) {
-        for(ServerInfo serverInfo : WarpSystem.getInstance().getServerManager().getOnlineServer()) {
-            if(serverInfo.equals(except)) continue;
+        WarpSystem.getInstance().getServerManager().getOnlineServer().forEach(serverInfo ->  {
+            if(serverInfo.equals(except)) return;
             WarpSystem.getInstance().getDataHandler().send(getInfoPacket(), serverInfo);
-        }
+        });
     }
 
     public SendGlobalSpawnOptionsPacket getInfoPacket() {

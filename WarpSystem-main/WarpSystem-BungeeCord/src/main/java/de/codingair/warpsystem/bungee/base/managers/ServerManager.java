@@ -2,9 +2,6 @@ package de.codingair.warpsystem.bungee.base.managers;
 
 import com.google.common.base.Preconditions;
 import de.codingair.codingapi.tools.Callback;
-import de.codingair.warpsystem.bungee.base.WarpSystem;
-import de.codingair.warpsystem.bungee.base.utils.ServerProvideOptionsEvent;
-import de.codingair.warpsystem.bungee.features.teleport.managers.TeleportManager;
 import de.codingair.warpsystem.base.transfer.packets.bungee.InitialPacket;
 import de.codingair.warpsystem.base.transfer.packets.bungee.SendServerPropertiesPacket;
 import de.codingair.warpsystem.base.transfer.packets.spigot.SendOptionsPacket;
@@ -13,19 +10,24 @@ import de.codingair.warpsystem.base.transfer.packets.utils.Packet;
 import de.codingair.warpsystem.base.transfer.packets.utils.PacketType;
 import de.codingair.warpsystem.base.transfer.serializeable.ServerOptions;
 import de.codingair.warpsystem.base.transfer.utils.PacketListener;
+import de.codingair.warpsystem.bungee.base.WarpSystem;
 import de.codingair.warpsystem.bungee.base.utils.ServerInitializeEvent;
+import de.codingair.warpsystem.bungee.base.utils.ServerProvideOptionsEvent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class ServerManager extends PacketListener implements Listener {
     private final HashMap<ServerInfo, ServerOptions> options = new HashMap<>();
-    private final ConcurrentHashMap<String, ServerPing> cachedPing = new ConcurrentHashMap<>();
-    private final Set<ServerInfo> onlineServer = new HashSet<>();
+    private final ConcurrentHashMap<ServerInfo, ServerPing> cachedPing = new ConcurrentHashMap<>();
     private final HashMap<ServerInfo, List<Callback<ServerInfo>>> waiting = new HashMap<>();
 
     public static void sendPlayerTo(ServerInfo server, ProxiedPlayer player, Callback<ServerInfo> c) {
@@ -46,47 +48,42 @@ public class ServerManager extends PacketListener implements Listener {
         l.add(c);
     }
 
-    public Set<ServerInfo> getOnlineServer() {
-        return onlineServer;
+    public Stream<ServerInfo> getOnlineServer() {
+        return cachedPing.entrySet().stream().filter((e) ->  e.getValue() != null && e.getValue().getStatus()).map(Map.Entry::getKey);
     }
 
     public boolean isOnline(ServerInfo info) {
-        return onlineServer.contains(info);
+        ServerPing ping = cachedPing.getOrDefault(info, null);
+        return ping != null && ping.getStatus();
     }
 
     public void run() {
-        for(ServerInfo info : WarpSystem.proxy().getServers().values()) {
-            cachedPing.put(info.getName().toLowerCase(), new ServerPing(false, 0, 0, null));
-        }
-
         WarpSystem.proxy().getScheduler().schedule(WarpSystem.getInstance(), () -> {
             for(ServerInfo info : WarpSystem.proxy().getServers().values()) {
-                info.ping((serverPing, error) -> {
-                    setStatus(info, error == null);
+                info.ping((serverPing, error) -> cachedPing.compute(info, (server, ping) -> {
+                    if(ping == null) ping = new ServerPing(false, 0, 0, null);
 
-                    cachedPing.compute(info.getName().toLowerCase(), (name, ping) -> {
-                        if(error == null) {
-                            ping.setStatus(true);
-                            ping.setPlayers(serverPing.getPlayers().getOnline());
-                            ping.setMaxPlayers(serverPing.getPlayers().getMax());
-                            ping.setMotd(info.getMotd());
-                        } else {
-                            ping.setStatus(false);
-                            ping.setPlayers(0);
-                            ping.setMaxPlayers(0);
-                            ping.setMotd(null);
-                        }
+                    if(error == null) {
+                        ping.setStatus(true);
+                        ping.setPlayers(serverPing.getPlayers().getOnline());
+                        ping.setMaxPlayers(serverPing.getPlayers().getMax());
+                        ping.setMotd(info.getMotd());
+                    } else {
+                        ping.setStatus(false);
+                        ping.setPlayers(0);
+                        ping.setMaxPlayers(0);
+                        ping.setMotd(null);
+                    }
 
-                        return ping;
-                    });
-                });
+                    return ping;
+                }));
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }, 0, 10, TimeUnit.SECONDS);
 
         WarpSystem.proxy().getScheduler().schedule(WarpSystem.getInstance(), () -> {
             HashMap<String, ServerPing> copy = new HashMap<>();
-            for(Map.Entry<String, ServerPing> e : cachedPing.entrySet()) {
-                copy.put(e.getKey(), new ServerPing(e.getValue()));
+            for(Map.Entry<ServerInfo, ServerPing> e : cachedPing.entrySet()) {
+                copy.put(e.getKey().getName().toLowerCase(), new ServerPing(e.getValue()));
             }
 
             SendServerPropertiesPacket p = new SendServerPropertiesPacket(copy);
@@ -109,14 +106,6 @@ public class ServerManager extends PacketListener implements Listener {
         }
     }
 
-    public synchronized void setStatus(ServerInfo info, boolean online) {
-        if(!online) {
-            this.onlineServer.remove(info);
-            TeleportManager.getInstance().removeOptions(info);
-            this.options.remove(info);
-        } else this.onlineServer.add(info);
-    }
-
     public ServerOptions getOptions(ServerInfo info) {
         if(info == null) return null;
         return options.get(info);
@@ -124,7 +113,7 @@ public class ServerManager extends PacketListener implements Listener {
 
     public ServerPing getLastPing(ServerInfo info) {
         if(info == null) return null;
-        return cachedPing.get(info.getName().toLowerCase());
+        return cachedPing.get(info);
     }
 
     @Override

@@ -130,16 +130,13 @@ public class MainListener extends PacketListener implements Listener {
 
                 ServerInfo info = WarpSystem.proxy().getServerInfo(p.getServer());
 
-                if(info == null) {
-                    answer.setValue(false);
-                    WarpSystem.getInstance().getDataHandler().send(answer, server);
-                } else {
-                    info.ping((serverPing, throwable) -> {
-                        WarpSystem.getInstance().getServerManager().setStatus(info, throwable == null);
-                        answer.setValue(throwable == null);
-                        WarpSystem.getInstance().getDataHandler().send(answer, server);
-                    });
+                if(info == null) answer.setValue(false);
+                else {
+                    ServerPing ping = WarpSystem.getInstance().getServerManager().getLastPing(info);
+                    answer.setValue(ping != null && ping.getStatus());
                 }
+
+                WarpSystem.getInstance().getDataHandler().send(answer, server);
                 break;
             }
 
