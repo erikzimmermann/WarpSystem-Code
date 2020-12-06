@@ -19,6 +19,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class PanelButton extends Button {
+    public static final int PREMIUM = 11;
+    public static final int MAX_PLAYERS = 140;
     private final String name;
     private final String skull;
     private final Material material;
@@ -48,7 +50,7 @@ public class PanelButton extends Button {
         if(material != null) item = new ItemBuilder(material);
         else item = new ItemBuilder(skull);
 
-        if(id < 21) item.setName("§e" + name + " " + (id < 10 ? "0" : "") + id);
+        if(id < PREMIUM) item.setName("§e" + name + " " + (id < 10 ? "0" : "") + id);
         else {
             item.setType(Material.NETHER_STAR);
             item.setName("§e" + name + " " + (id < 10 ? "0" : "") + id + " §8(§6§lPartner§8)");
@@ -59,11 +61,11 @@ public class PanelButton extends Button {
         if(ping == null || !ping.getStatus()) item.addLore("§7Status: §cOffline");
         else {
             item.addLore("§7Status: §aOnline");
-            item.addLore("§7Spieler: " + (isFull(ping) ? "§c" : "§a") + ping.getPlayers() + "§8/§770");
+            item.addLore("§7Spieler: " + (isFull(ping) ? "§c" : "§a") + ping.getPlayers() + "§8/§7" + MAX_PLAYERS);
 
             if(joined) item.addLore("", "§7» Bereits beigetreten");
             else {
-                if(id >= 21) {
+                if(id >= PREMIUM) {
                     if(this.player.hasPermission("group.partner")) item.addLore("", "§7» Speziell für dich");
                     else item.addLore("", "§7» Für die " + WarpPanel.COLOR_NITRADO + "#NitradoFamily");
                 } else item.addLore("", "§7» Server wechseln");
@@ -75,7 +77,7 @@ public class PanelButton extends Button {
 
     @Override
     public boolean canClick(ClickType type) {
-        if(id >= 21 && !player.hasPermission("group.partner")) return false;
+        if(id >= PREMIUM && !player.hasPermission("group.partner")) return false;
 
         return type == ClickType.LEFT && !joined && ping != null && (!isFull(ping) || player.hasPermission(WarpPanel.PERMISSION_FULL));
     }
@@ -110,6 +112,6 @@ public class PanelButton extends Button {
 
     public static boolean isFull(ServerPing ping) {
         if(ping == null) return true;
-        return ping.getPlayers() >= 70;
+        return ping.getPlayers() >= MAX_PLAYERS;
     }
 }

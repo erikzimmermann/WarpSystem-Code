@@ -46,17 +46,13 @@ public class ServerPage extends Page {
     public void buildItems() {
         int id = 0;
         for(int i = 0; i < 3; i++) {
-            addButton(3 + i, 0, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
+            addButton(3 + i, 1, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
         }
-
-        for(int j = 0; j < 3; j++) {
-            for(int i = 0; i < 5; i++) {
-                addButton(2 + i, 1 + j, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
-            }
+        for(int i = 0; i < 5; i++) {
+            addButton(2 + i, 2, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
         }
-
         for(int i = 0; i < 3; i++) {
-            addButton(3 + i, 4, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
+            addButton(3 + i, 3, new PanelButton("Event", SKULLS[id++], id, "event" + (id < 10 ? "0" : "") + id, gui.getPlayer()));
         }
 
         String server = WarpSystem.getInstance().getCurrentServer();
@@ -69,7 +65,7 @@ public class ServerPage extends Page {
         addButton(8, 2, new Button() {
             @Override
             public ItemStack buildItem() {
-                return new ItemBuilder(QUESTION).setName("§7Du bist hier: §e" + finalServer).addLore("§7Status: §aOnline").addLore("§7Spieler: " + (ping == null ? "§7?" : ((PanelButton.isFull(ping) ? "§c" : "§a") + ping.getPlayers())) + "§8/§770").getItem();
+                return new ItemBuilder(QUESTION).setName("§7Du bist hier: §e" + finalServer).addLore("§7Status: §aOnline").addLore("§7Spieler: " + (ping == null ? "§7?" : ((PanelButton.isFull(ping) ? "§c" : "§a") + ping.getPlayers())) + "§8/§7" + PanelButton.MAX_PLAYERS).getItem();
             }
 
             @Override
