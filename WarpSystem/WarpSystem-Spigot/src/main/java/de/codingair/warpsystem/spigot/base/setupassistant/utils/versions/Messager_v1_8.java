@@ -24,10 +24,10 @@ public class Messager_v1_8 implements Messager {
     public Messager_v1_8(@NotNull Player player, @NotNull SetupAssistant assistant) {
         this.player = player;
 
-        Class<?> iPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, "PacketPlayInChat");
+        Class<?> iPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, Version.choose("PacketPlayInChat", 21.11, "ServerboundChatPacket"));
         IReflection.FieldAccessor<String> inputText = IReflection.getField(iPacketClass, Version.choose("a", 17, "b"));
 
-        Class<?> oPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, "PacketPlayOutChat");
+        Class<?> oPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, Version.choose("PacketPlayOutChat", 21.11, "ClientboundChatPacket"));
         IReflection.FieldAccessor<?> outputText = IReflection.getField(oPacketClass, Version.choose("components", 17, "a"));
 
         reader = new PacketReader(player, "WS-SetupAssistant", WarpSystem.getInstance()) {

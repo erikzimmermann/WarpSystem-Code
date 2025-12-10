@@ -30,7 +30,7 @@ public class Messager_v1_19 implements Messager {
     public Messager_v1_19(@NotNull Player player, @NotNull SetupAssistant assistant) {
         this.player = player;
 
-        Class<?> iPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, "PacketPlayInChat");
+        Class<?> iPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, Version.choose("PacketPlayInChat", 21.11, "ServerboundChatPacket"));
         IReflection.FieldAccessor<String> inputText = IReflection.getField(iPacketClass, String.class, 0);
 
         Class<?> oPlayerPacketClass = IReflection.getClass(IReflection.ServerPacket.PACKETS, "ClientboundPlayerChatPacket");

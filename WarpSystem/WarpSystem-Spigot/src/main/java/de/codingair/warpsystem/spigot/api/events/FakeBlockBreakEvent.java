@@ -29,10 +29,10 @@ public class FakeBlockBreakEvent extends BlockBreakEvent {
     private static final IReflection.FieldAccessor<PermissibleBase> PERMISSION_BASE = IReflection.getField(PacketUtils.CraftPlayerClass, PermissibleBase.class, 0);
     private static final IReflection.FieldAccessor<?> PLAYER_CONNECTION_FIELD = IReflection.getField(PacketUtils.EntityPlayerClass, PacketUtils.PlayerConnectionClass, 0);
 
-    private static final Class<?> PlayerInteractManagerClass = IReflection.getClass(IReflection.ServerPacket.MINECRAFT_PACKAGE("net.minecraft.server.level"), "PlayerInteractManager");
+    private static final Class<?> PlayerInteractManagerClass = IReflection.getClass(IReflection.ServerPacket.MINECRAFT_PACKAGE("net.minecraft.server.level"), Version.choose("PlayerInteractManager", 21.11, "ServerPlayerGameMode"));
 
     static {
-        Class<?> protocolDirection = IReflection.getClass(IReflection.ServerPacket.PROTOCOL, "EnumProtocolDirection");
+        Class<?> protocolDirection = IReflection.getClass(IReflection.ServerPacket.PROTOCOL, Version.choose("EnumProtocolDirection", 21.11, "PacketFlow"));
 
         if (Version.atLeast(20.02)) {
             Class<?> clientInformationClass = IReflection.getClass("net.minecraft.server.level.", "ClientInformation");
