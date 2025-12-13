@@ -50,14 +50,14 @@ public class Sounds extends HotbarGUI {
     }
 
     public void previous(SoundData soundData) {
-        if(soundData == null || soundData.getSound() == null) return; // guard
+        if(soundData == null || soundData.getSound() == null) return; // Prevent NullPointerException if sound data is not initialized (no sound selected)
         int id = soundData.getSound().ordinal() - 1;
         if (id < 0) id = sounds.length - 1; // fixed off-by-one: was sounds.length
         soundData.setSound(sounds[id]);
     }
 
     public void shiftPrevious(SoundData soundData) {
-        if (soundData == null || soundData.getSound() == null) return; // guard
+        if (soundData == null || soundData.getSound() == null) return; // Prevent NullPointerException if sound data is not initialized (no sound selected)
         Sound sound = soundData.getSound();
         for (int i = sound.ordinal(); true; i--) {
             if (i < 0) i = sounds.length - 1; // fixed off-by-one and boundary

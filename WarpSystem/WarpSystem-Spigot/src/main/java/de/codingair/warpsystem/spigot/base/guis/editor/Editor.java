@@ -173,9 +173,7 @@ public class Editor<C> extends SimpleGUI {
 
                 SoundData sound = getSuccessSound();
                 if (sound != null) {
-                    de.codingair.codingapi.server.sounds.Sound s = sound.getSound();
-                    WarpSystem.getInstance().getLogger().info("Editor: attempting to play success sound: " + (s == null ? "null" : s.name()) + ", vol=" + sound.getVolume() + ", pitch=" + sound.getPitch());
-                    de.codingair.warpsystem.spigot.base.utils.SoundUtil.play(player, sound);
+                    SoundUtil.play(player, sound);
                 }
 
                 String msg = getSuccessMessage();

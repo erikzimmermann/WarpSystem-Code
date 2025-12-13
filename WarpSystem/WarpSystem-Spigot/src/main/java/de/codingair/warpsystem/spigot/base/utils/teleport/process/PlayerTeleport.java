@@ -9,6 +9,7 @@ import de.codingair.warpsystem.api.destinations.utils.Result;
 import de.codingair.warpsystem.spigot.api.events.PlayerTeleportAcceptEvent;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -79,7 +80,7 @@ public class PlayerTeleport extends TeleportStage {
                                 public void run() {
                                     Bukkit.getPluginManager().callEvent(new PlayerTeleportAcceptEvent(player));
                                 }
-                            }.runTaskLater(WarpSystem.getInstance(), 5); //safety timeout (PlayerTeleportAcceptEvent doesn't get triggered while spawning)
+                            }.runTaskLater(WarpSystem.getInstance(), 1); //safety timeout (PlayerTeleportAcceptEvent doesn't get triggered while spawning)
                         }
                     }
                 }
@@ -90,8 +91,7 @@ public class PlayerTeleport extends TeleportStage {
                         if (player.isOnline()) {
                             options.getOriginalDestination().sendMessage(player, finalMessage, options.getDisplayName(), options.getCosts(player), options.getOriginalOrigin());
                             if (options.getTeleportSound() != null) {
-                                WarpSystem.getInstance().getLogger().info("Attempting to play teleport sound: " + (options.getTeleportSound().getSound() == null ? "null" : options.getTeleportSound().getSound().name()) + ", vol=" + options.getTeleportSound().getVolume() + ", pitch=" + options.getTeleportSound().getPitch());
-                                de.codingair.warpsystem.spigot.base.utils.SoundUtil.play(player, options.getTeleportSound());
+                                SoundUtil.play(player, options.getTeleportSound());
                              }
                              end();
                         }
@@ -111,7 +111,10 @@ public class PlayerTeleport extends TeleportStage {
         options.getOriginalDestination().teleport(player, message, options.getDisplayName(), options.getPermission() == null, options.isSilent(), options.getCosts(player), new Callback<Result>() {
             @Override
             public void accept(Result res) {
-                if (res == Result.SERVER_NOT_AVAILABLE) player.sendMessage(options.getServerNotOnline());
+                if (res == Result.SERVER_NOT_AVAILABLE) {
+                    String s = options.getServerNotOnline();
+                    if (s != null) player.sendMessage(s);
+                }
 
                 if (!options.getOriginalDestination().usesBukkitTeleportation()) {
                     if (res == Result.SUCCESS) end();

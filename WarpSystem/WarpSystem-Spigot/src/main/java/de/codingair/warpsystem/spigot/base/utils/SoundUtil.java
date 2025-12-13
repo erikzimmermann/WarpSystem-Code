@@ -12,11 +12,11 @@ public class SoundUtil {
         // Try codingapi play first
         try {
             data.play(player);
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             // ignore, try fallback
             try {
                 WarpSystem.getInstance().getLogger().warning("SoundData.play failed for " + (data.getSound() == null ? "null" : data.getSound().name()) + ": " + ex.getMessage());
-            } catch (Throwable ex2) {
+            } catch (Exception ex2) {
                 ex2.printStackTrace();
             }
         }
@@ -31,30 +31,29 @@ public class SoundUtil {
                 try {
                     player.playSound(loc, name, data.getVolume(), data.getPitch());
                     return;
-                } catch (Throwable ignored) {}
+                } catch (Exception ignored) {}
 
                 // Try lower-case and dot notation
                 try {
                     String alt = name.toLowerCase().replace('_', '.');
                     player.playSound(loc, alt, data.getVolume(), data.getPitch());
                     return;
-                } catch (Throwable ignored) {}
+                } catch (Exception ignored) {}
 
                 // Try namespace prefix
                 try {
                     String ns = "minecraft:" + name.toLowerCase().replace('_', '.');
                     player.playSound(loc, ns, data.getVolume(), data.getPitch());
                     return;
-                } catch (Throwable ignored) {}
+                } catch (Exception ignored) {}
             }
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             try {
                 String soundName = (data.getSound() == null ? "null" : data.getSound().name());
                 WarpSystem.getInstance().getLogger().warning("All fallback sound play attempts failed for " + soundName + ": " + ex.getMessage());
-            } catch (Throwable logEx) {
+            } catch (Exception logEx) {
                 // If logging fails, do nothing to avoid further issues
             }
         }
     }
 }
-
