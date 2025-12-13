@@ -31,21 +31,27 @@ public class SoundUtil {
                 try {
                     player.playSound(loc, name, data.getVolume(), data.getPitch());
                     return;
-                } catch (Throwable ignored) {}
+                } catch (Throwable ex) {
+                    WarpSystem.getInstance().getLogger().fine("Raw sound name play failed for " + name + ": " + ex.getMessage());
+                }
 
                 // Try lower-case and dot notation
                 try {
                     String alt = name.toLowerCase().replace('_', '.');
                     player.playSound(loc, alt, data.getVolume(), data.getPitch());
                     return;
-                } catch (Throwable ignored) {}
+                } catch (Throwable ex) {
+                    WarpSystem.getInstance().getLogger().fine("Lower-case/dot sound name play failed for " + name + ": " + ex.getMessage());
+                }
 
                 // Try namespace prefix
                 try {
                     String ns = "minecraft:" + name.toLowerCase().replace('_', '.');
                     player.playSound(loc, ns, data.getVolume(), data.getPitch());
                     return;
-                } catch (Throwable ignored) {}
+                } catch (Throwable ex) {
+                    WarpSystem.getInstance().getLogger().fine("Namespaced sound name play failed for " + name + ": " + ex.getMessage());
+                }
             }
         } catch (Throwable ex) {
             try {
