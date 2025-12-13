@@ -57,7 +57,7 @@ public class Sounds extends HotbarGUI {
     }
 
     public void shiftPrevious(SoundData soundData) {
-        if(soundData == null || soundData.getSound() == null) return; // guard
+        if (soundData == null || soundData.getSound() == null) return; // guard
         Sound sound = soundData.getSound();
         for (int i = sound.ordinal(); true; i--) {
             if (i < 0) i = sounds.length - 1; // fixed off-by-one and boundary
