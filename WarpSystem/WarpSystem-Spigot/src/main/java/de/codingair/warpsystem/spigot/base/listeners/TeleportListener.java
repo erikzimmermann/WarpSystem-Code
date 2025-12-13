@@ -44,14 +44,7 @@ public class TeleportListener implements Listener {
         if (player != null && player.isOnline()) {
             //teleport
             org.bukkit.Location l = player.getLocation();
-            try {
-                // Play the teleport sound immediately to avoid perceived delay
-                if (!options.isSilent() && options.getTeleportSound() != null) {
-                    SoundUtil.play(player, options.getTeleportSound());
-                    // prevent duplicate play later: set a dummy SoundData with null sound so later getTeleportSound() returns this but it contains no Sound
-                    try { options.setTeleportSound(new SoundData(Sound.ENTITY_ITEM_BREAK, 0F, 1F)); } catch (Throwable ignored) { options.setTeleportSound(null); }
-                }
-            } catch (Throwable ignored) {}
+            // Removed preemptive teleport sound playback to avoid duplicate sound.
             AsyncCatcher.runSync(WarpSystem.getInstance(), () -> WarpSystem.getInstance().getTeleportManager().teleport(player, options, true), l);
             return CompletableFuture.completedFuture(l);
         } else {
