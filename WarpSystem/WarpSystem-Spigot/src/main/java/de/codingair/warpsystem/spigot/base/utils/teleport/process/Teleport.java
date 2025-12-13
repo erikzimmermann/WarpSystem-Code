@@ -1,6 +1,5 @@
 package de.codingair.warpsystem.spigot.base.utils.teleport.process;
 
-import de.codingair.codingapi.server.sounds.Sound;
 import de.codingair.codingapi.tools.Callback;
 import de.codingair.codingapi.utils.Value;
 import de.codingair.warpsystem.api.destinations.utils.Result;
