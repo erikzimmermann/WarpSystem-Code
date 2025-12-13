@@ -15,8 +15,6 @@ import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.adapters.
 import de.codingair.warpsystem.spigot.base.utils.teleport.process.Teleport;
 import org.bukkit.Bukkit;
 import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
-import de.codingair.codingapi.server.sounds.Sound;
-import de.codingair.codingapi.server.sounds.SoundData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
