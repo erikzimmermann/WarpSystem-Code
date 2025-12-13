@@ -86,7 +86,6 @@ public class Teleport {
                     Sound s = options.getCancelSound().getSound();
                     SoundUtil.play(player, options.getCancelSound());
                 } else if (active instanceof WaitWhileMoving) {
-                    Sound s = options.getCancelSound().getSound();
                     SoundUtil.play(player, options.getCancelSound());
                 }
 
