@@ -21,7 +21,7 @@ public class SoundAction extends ActionObject<SoundData> {
 
     @Override
     public boolean perform(Player player) {
-        if(getValue() == null) {
+        if (getValue() == null) {
             WarpSystem.getInstance().getLogger().warning("Tried to play a null SoundData in SoundAction.perform");
             return false;
         }
