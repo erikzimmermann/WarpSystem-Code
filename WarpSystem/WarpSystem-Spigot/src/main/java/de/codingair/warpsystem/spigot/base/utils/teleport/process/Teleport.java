@@ -88,8 +88,8 @@ public class Teleport {
                     SoundUtil.play(player, options.getCancelSound());
                 }
 
-             }
-         }
+        }
+    }
         options.fireCallbacks(result);
 
         if (result == Result.NOT_ENOUGH_MONEY) {
