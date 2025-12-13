@@ -72,7 +72,7 @@ public class Sounds extends HotbarGUI {
         setItem(0, new ItemComponent(new ItemBuilder(Skull.ArrowLeft).setName("§7» §c" + Lang.get("Back") + "§7 «").getItem()).setLink(menu), false);
         setItem(1, new ItemComponent(new ItemBuilder(XMaterial.BLACK_STAINED_GLASS_PANE).setHideName(true).getItem()));
 
-        // safer display values
+        // Use safe accessors to prevent NullPointerException when displaying sound properties
         setItem(2, new ItemComponent(new ItemBuilder(XMaterial.MUSIC_DISC_WAIT)
                 .setName("§7" + Lang.get("Tick_Sound") + ": '§e" + safeSoundName(getTickSound()) + "§7'")
                 .getItem(), new ItemListener() {
