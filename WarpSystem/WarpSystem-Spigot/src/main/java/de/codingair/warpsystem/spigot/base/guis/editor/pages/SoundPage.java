@@ -199,7 +199,6 @@ public class SoundPage extends PageItem {
                 if (e.isLeftClick()) soundData.setVolume(Math.max(round(soundData.getVolume() - 0.1F), 0F));
                 else soundData.setVolume(Math.min(round(soundData.getVolume() + 0.1F), 1F));
 
-                de.codingair.warpsystem.spigot.base.WarpSystem.getInstance().getLogger().info("SoundPage: playing sound (volume change): " + (soundData.getSound() == null ? "null" : soundData.getSound().name()) + ", vol=" + soundData.getVolume() + ", pitch=" + soundData.getPitch());
                 soundData.play(player);
                 update();
             }
