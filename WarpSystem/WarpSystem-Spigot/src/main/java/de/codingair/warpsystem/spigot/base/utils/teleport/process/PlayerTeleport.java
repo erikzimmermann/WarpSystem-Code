@@ -92,8 +92,8 @@ public class PlayerTeleport extends TeleportStage {
                             if (options.getTeleportSound() != null) {
                                 WarpSystem.getInstance().getLogger().info("Attempting to play teleport sound: " + (options.getTeleportSound().getSound() == null ? "null" : options.getTeleportSound().getSound().name()) + ", vol=" + options.getTeleportSound().getVolume() + ", pitch=" + options.getTeleportSound().getPitch());
                                 de.codingair.warpsystem.spigot.base.utils.SoundUtil.play(player, options.getTeleportSound());
-                             }
-                             end();
+                            }
+                            end();
                         }
                     }
                 }
