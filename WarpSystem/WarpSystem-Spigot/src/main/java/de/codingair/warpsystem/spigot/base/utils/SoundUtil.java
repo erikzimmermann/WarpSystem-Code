@@ -47,7 +47,14 @@ public class SoundUtil {
                     return;
                 } catch (Throwable ignored) {}
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ex) {
+            try {
+                String soundName = (data.getSound() == null ? "null" : data.getSound().name());
+                WarpSystem.getInstance().getLogger().warning("All fallback sound play attempts failed for " + soundName + ": " + ex.getMessage());
+            } catch (Throwable logEx) {
+                // If logging fails, do nothing to avoid further issues
+            }
+        }
     }
 }
 
