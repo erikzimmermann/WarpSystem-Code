@@ -16,7 +16,9 @@ public class SoundUtil {
             // ignore, try fallback
             try {
                 WarpSystem.getInstance().getLogger().warning("SoundData.play failed for " + (data.getSound() == null ? "null" : data.getSound().name()) + ": " + ex.getMessage());
-            } catch (Throwable ignored) {}
+            } catch (Throwable ex2) {
+                ex2.printStackTrace();
+            }
         }
 
         // Fallback: try Bukkit string-based playSound (allows namespaced/normalized sounds)
