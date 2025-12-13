@@ -3,7 +3,9 @@ package de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.types;
 import de.codingair.codingapi.server.sounds.Sound;
 import de.codingair.codingapi.server.sounds.SoundData;
 import de.codingair.codingapi.tools.io.utils.DataMask;
+import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.guis.editor.pages.SoundPage;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.Action;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.ActionObject;
 import org.bukkit.entity.Player;
@@ -19,7 +21,13 @@ public class SoundAction extends ActionObject<SoundData> {
 
     @Override
     public boolean perform(Player player) {
-        getValue().play(player);
+        if(getValue() == null) {
+            WarpSystem.getInstance().getLogger().warning("Tried to play a null SoundData in SoundAction.perform");
+            return false;
+        }
+        Sound s = getValue().getSound();
+        WarpSystem.getInstance().getLogger().info("Playing sound via SoundAction: " + (s == null ? "null" : s.name()) + ", vol=" + getValue().getVolume() + ", pitch=" + getValue().getPitch());
+        SoundUtil.play(player, getValue());
         return true;
     }
 
@@ -35,8 +43,26 @@ public class SoundAction extends ActionObject<SoundData> {
 
     @Override
     public boolean read(DataMask d) throws Exception {
-        setValue(new SoundData(Sound.valueOf(d.getString("sound", "ENDERMAN_TELEPORT")), d.getFloat("volume"), d.getFloat("pitch")));
+        String soundName = d.getString("sound", "ENDERMAN_TELEPORT");
+        Sound s = safeValueOfSound(soundName);
+        setValue(new SoundData(s, d.getFloat("volume"), d.getFloat("pitch")));
         return true;
+    }
+
+    private Sound safeValueOfSound(String name) {
+        if (name == null) return Sound.ENTITY_ENDERMAN_TELEPORT;
+        try {
+            return de.codingair.codingapi.server.sounds.Sound.valueOf(name);
+        } catch (Exception ex) {
+            // try some normalizations
+            String n = name.toUpperCase().replace('.', '_').replace('-', '_');
+            if (n.contains(":")) n = n.substring(n.indexOf(":") + 1);
+            try {
+                return Sound.valueOf(n);
+            } catch (Exception ex2) {
+                return Sound.ENTITY_ENDERMAN_TELEPORT;
+            }
+        }
     }
 
     @Override

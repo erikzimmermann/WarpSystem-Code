@@ -14,6 +14,7 @@ import de.codingair.codingapi.tools.items.ItemBuilder;
 import de.codingair.codingapi.tools.items.XMaterial;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -147,7 +148,10 @@ public class Editor<C> extends SimpleGUI {
             @Override
             public void onClick(InventoryClickEvent e, Player player) {
                 backup.cancel(clone);
-                if (getCancelSound() != null) getCancelSound().play(player);
+                if (getCancelSound() != null) {
+                    Sound s = getCancelSound().getSound();
+                    SoundUtil.play(player, getCancelSound());
+                }
             }
 
             @Override
@@ -168,7 +172,11 @@ public class Editor<C> extends SimpleGUI {
                 backup.applyTo(clone);
 
                 SoundData sound = getSuccessSound();
-                if (sound != null) sound.play(player);
+                if (sound != null) {
+                    de.codingair.codingapi.server.sounds.Sound s = sound.getSound();
+                    WarpSystem.getInstance().getLogger().info("Editor: attempting to play success sound: " + (s == null ? "null" : s.name()) + ", vol=" + sound.getVolume() + ", pitch=" + sound.getPitch());
+                    de.codingair.warpsystem.spigot.base.utils.SoundUtil.play(player, sound);
+                }
 
                 String msg = getSuccessMessage();
                 if (msg != null) getPlayer().sendMessage(msg);

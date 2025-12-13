@@ -15,6 +15,7 @@ import de.codingair.warpsystem.spigot.base.guis.editor.Editor;
 import de.codingair.warpsystem.spigot.base.guis.editor.StandardButtonOption;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
 import de.codingair.warpsystem.spigot.base.utils.Permissions;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.Action;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.types.BoundAction;
 import de.codingair.warpsystem.spigot.base.utils.options.specific.WarpGUIOptions;
@@ -360,7 +361,7 @@ public class GWarps extends GUI {
                         return;
                     }
 
-                    if (!icon.hasAction(Action.SOUND)) s.play(player);
+                    if (!icon.hasAction(Action.SOUND)) SoundUtil.play(player, s);
 
                     if (icon.isPage()) {
                         GWarps.this.page = icon;

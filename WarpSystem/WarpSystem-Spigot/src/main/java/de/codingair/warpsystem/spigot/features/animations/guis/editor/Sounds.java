@@ -31,12 +31,14 @@ public class Sounds extends HotbarGUI {
     }
 
     public void next(SoundData soundData) {
+        if(soundData == null || soundData.getSound() == null) return;
         int id = soundData.getSound().ordinal() + 1;
         if (id == sounds.length) id = 0;
         soundData.setSound(sounds[id]);
     }
 
     public void shiftNext(SoundData soundData) {
+        if(soundData == null || soundData.getSound() == null) return;
         Sound sound = soundData.getSound();
         for (int i = sound.ordinal(); true; i++) {
             if (i == sounds.length) i = 0;
@@ -48,27 +50,31 @@ public class Sounds extends HotbarGUI {
     }
 
     public void previous(SoundData soundData) {
+        if(soundData == null || soundData.getSound() == null) return; // guard
         int id = soundData.getSound().ordinal() - 1;
-        if (id < 0) id = sounds.length;
+        if (id < 0) id = sounds.length - 1; // fixed off-by-one: was sounds.length
         soundData.setSound(sounds[id]);
     }
 
     public void shiftPrevious(SoundData soundData) {
+        if(soundData == null || soundData.getSound() == null) return; // guard
         Sound sound = soundData.getSound();
         for (int i = sound.ordinal(); true; i--) {
+            if (i < 0) i = sounds.length - 1; // fixed off-by-one and boundary
             if (sound.name().charAt(0) != sounds[i].name().charAt(0)) {
                 soundData.setSound(sounds[i]);
                 break;
             }
-            if (i == 0) i = sounds.length;
         }
     }
 
     public void initialize() {
         setItem(0, new ItemComponent(new ItemBuilder(Skull.ArrowLeft).setName("§7» §c" + Lang.get("Back") + "§7 «").getItem()).setLink(menu), false);
         setItem(1, new ItemComponent(new ItemBuilder(XMaterial.BLACK_STAINED_GLASS_PANE).setHideName(true).getItem()));
+
+        // safer display values
         setItem(2, new ItemComponent(new ItemBuilder(XMaterial.MUSIC_DISC_WAIT)
-                .setName("§7" + Lang.get("Tick_Sound") + ": '§e" + getTickSound().getSound().name() + "§7'")
+                .setName("§7" + Lang.get("Tick_Sound") + ": '§e" + safeSoundName(getTickSound()) + "§7'")
                 .getItem(), new ItemListener() {
             @Override
             public void onClick(HotbarGUI gui, ItemComponent ic, Player player, ClickType clickType) {
@@ -86,7 +92,7 @@ public class Sounds extends HotbarGUI {
                 }
 
                 menu.getAnimPlayer().update();
-                updateDisplayName(ic, "§7" + Lang.get("Tick_Sound") + ": '§e" + getTickSound().getSound().name() + "§7'");
+                updateDisplayName(ic, "§7" + Lang.get("Tick_Sound") + ": '§e" + safeSoundName(getTickSound()) + "§7'");
             }
 
             @Override
@@ -101,7 +107,7 @@ public class Sounds extends HotbarGUI {
         }));
 
         setItem(3, new ItemComponent(new ItemBuilder(XMaterial.NOTE_BLOCK)
-                .setName("§7" + Lang.get("Volume") + ": §e" + getTickSound().getVolume())
+                .setName("§7" + Lang.get("Volume") + ": §e" + safeVolume(getTickSound()))
                 .getItem(), new ItemListener() {
             @Override
             public void onClick(HotbarGUI gui, ItemComponent ic, Player player, ClickType clickType) {
@@ -132,7 +138,7 @@ public class Sounds extends HotbarGUI {
         }));
 
         setItem(4, new ItemComponent(new ItemBuilder(XMaterial.BLAZE_ROD)
-                .setName("§7" + Lang.get("Pitch") + ": §e" + getTickSound().getPitch())
+                .setName("§7" + Lang.get("Pitch") + ": §e" + safePitch(getTickSound()))
                 .getItem(), new ItemListener() {
             @Override
             public void onClick(HotbarGUI gui, ItemComponent ic, Player player, ClickType clickType) {
@@ -163,7 +169,7 @@ public class Sounds extends HotbarGUI {
         }));
 
         setItem(6, new ItemComponent(new ItemBuilder(XMaterial.MUSIC_DISC_CHIRP)
-                .setName("§7" + Lang.get("Teleport_Sound") + ": '§e" + getTeleportSound().getSound().name() + "§7'")
+                .setName("§7" + Lang.get("Teleport_Sound") + ": '§e" + safeSoundName(getTeleportSound()) + "§7'")
                 .getItem(), new ItemListener() {
             @Override
             public void onClick(HotbarGUI gui, ItemComponent ic, Player player, ClickType clickType) {
@@ -181,7 +187,7 @@ public class Sounds extends HotbarGUI {
                 }
 
                 menu.getAnimPlayer().update();
-                updateDisplayName(ic, "§7" + Lang.get("Teleport_Sound") + ": '§e" + getTeleportSound().getSound().name() + "§7'");
+                updateDisplayName(ic, "§7" + Lang.get("Teleport_Sound") + ": '§e" + safeSoundName(getTeleportSound()) + "§7'");
             }
 
             @Override
@@ -196,7 +202,7 @@ public class Sounds extends HotbarGUI {
         }));
 
         setItem(7, new ItemComponent(new ItemBuilder(XMaterial.NOTE_BLOCK)
-                .setName("§7" + Lang.get("Volume") + ": §e" + getTeleportSound().getVolume())
+                .setName("§7" + Lang.get("Volume") + ": §e" + safeVolume(getTeleportSound()))
                 .getItem(), new ItemListener() {
             @Override
             public void onClick(HotbarGUI gui, ItemComponent ic, Player player, ClickType clickType) {
@@ -227,7 +233,7 @@ public class Sounds extends HotbarGUI {
         }));
 
         setItem(8, new ItemComponent(new ItemBuilder(XMaterial.BLAZE_ROD)
-                .setName("§7" + Lang.get("Pitch") + ": §e" + getTeleportSound().getPitch())
+                .setName("§7" + Lang.get("Pitch") + ": §e" + safePitch(getTeleportSound()))
                 .getItem(), new ItemListener() {
             @Override
             public void onClick(HotbarGUI gui, ItemComponent ic, Player player, ClickType clickType) {
@@ -256,6 +262,18 @@ public class Sounds extends HotbarGUI {
                 MessageAPI.stopSendingActionBar(getPlayer());
             }
         }));
+    }
+
+    private String safeSoundName(SoundData sd) {
+        return (sd != null && sd.getSound() != null) ? sd.getSound().name() : "NONE";
+    }
+
+    private float safeVolume(SoundData sd) {
+        return sd != null ? sd.getVolume() : 0F;
+    }
+
+    private float safePitch(SoundData sd) {
+        return sd != null ? sd.getPitch() : 0F;
     }
 
     private float round(float d) {

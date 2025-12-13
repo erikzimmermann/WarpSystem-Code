@@ -4,6 +4,7 @@ import de.codingair.codingapi.particles.animations.movables.PlayerMid;
 import de.codingair.codingapi.player.MessageAPI;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import de.codingair.warpsystem.spigot.features.animations.AnimationManager;
 import de.codingair.warpsystem.spigot.features.animations.utils.AnimationPlayer;
 import org.bukkit.Bukkit;
@@ -71,7 +72,7 @@ public class TeleportDelay extends TeleportStage {
                     return;
                 }
 
-                if (!hasAnimation && AnimationManager.getInstance().getActive().getTickSound() != null) AnimationManager.getInstance().getActive().getTickSound().play(player);
+                if (!hasAnimation && AnimationManager.getInstance().getActive().getTickSound() != null) SoundUtil.play(player, AnimationManager.getInstance().getActive().getTickSound());
 
                 if (d == Display.ACTION_BAR) MessageAPI.sendActionBar(player, msg.replace("%seconds%", left + ""));
                 else if (d == TeleportDelay.Display.TITLE) {

@@ -1,11 +1,13 @@
 package de.codingair.warpsystem.spigot.base.utils.teleport.process;
 
+import de.codingair.codingapi.server.sounds.Sound;
 import de.codingair.codingapi.tools.Callback;
 import de.codingair.codingapi.utils.Value;
 import de.codingair.warpsystem.api.destinations.utils.Result;
 import de.codingair.warpsystem.api.events.AsyncPlayerTeleportEvent;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import de.codingair.warpsystem.spigot.base.utils.money.Bank;
 import de.codingair.warpsystem.spigot.base.utils.teleport.TeleportOptions;
 import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.Destination;
@@ -80,10 +82,16 @@ public class Teleport {
         if (options.getCancelSound() != null) {
             if (stage != null) {
                 TeleportStage active = stage.active();
-                if (active instanceof TeleportDelay && getOptions().getDelay(player) > 0) options.getCancelSound().play(player);
-                else if (active instanceof WaitWhileMoving) options.getCancelSound().play(player);
-            }
-        }
+                if (active instanceof TeleportDelay && getOptions().getDelay(player) > 0) {
+                    Sound s = options.getCancelSound().getSound();
+                    SoundUtil.play(player, options.getCancelSound());
+                } else if (active instanceof WaitWhileMoving) {
+                    Sound s = options.getCancelSound().getSound();
+                    SoundUtil.play(player, options.getCancelSound());
+                }
+
+             }
+         }
         options.fireCallbacks(result);
 
         if (result == Result.NOT_ENOUGH_MONEY) {

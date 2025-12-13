@@ -89,8 +89,12 @@ public class PlayerTeleport extends TeleportStage {
                     if (player.equals(e.getPlayer())) {
                         if (player.isOnline()) {
                             options.getOriginalDestination().sendMessage(player, finalMessage, options.getDisplayName(), options.getCosts(player), options.getOriginalOrigin());
-                            if (options.getTeleportSound() != null) options.getTeleportSound().play(player);
-                            end();
+                            if (options.getTeleportSound() != null) {
+                                de.codingair.codingapi.server.sounds.Sound s = options.getTeleportSound().getSound();
+                                WarpSystem.getInstance().getLogger().info("Attempting to play teleport sound: " + (s == null ? "null" : s.name()) + ", vol=" + options.getTeleportSound().getVolume() + ", pitch=" + options.getTeleportSound().getPitch());
+                                de.codingair.warpsystem.spigot.base.utils.SoundUtil.play(player, options.getTeleportSound());
+                             }
+                             end();
                         }
                     }
                 }

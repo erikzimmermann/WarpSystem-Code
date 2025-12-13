@@ -8,6 +8,7 @@ import de.codingair.codingapi.utils.Removable;
 import de.codingair.warpsystem.core.transfer.packets.spigot.ChatInputGUITogglePacket;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -62,7 +63,7 @@ public abstract class ChatInputGUI implements Removable {
         };
 
         this.runnable.runTaskTimer(this.plugin, 5, 10);
-        if (this.openSound != null) this.openSound.play(player);
+        if (this.openSound != null) SoundUtil.play(player, this.openSound);
     }
 
     private void sendTitle(int in, int stay, int out) {
@@ -78,12 +79,12 @@ public abstract class ChatInputGUI implements Removable {
         onEnter(e);
 
         if (e.isClose()) {
-            if (this.submitFinishSound != null) this.submitFinishSound.play(player);
+            if (this.submitFinishSound != null) SoundUtil.play(player, this.submitFinishSound);
             close();
             return;
         } else if (e.getNotifier() != null) setTitle(e.getNotifier());
 
-        if (this.submitMistakeSound != null) this.submitMistakeSound.play(player);
+        if (this.submitMistakeSound != null) SoundUtil.play(player, this.submitMistakeSound);
     }
 
     public abstract void onEnter(ChatInputEvent e);

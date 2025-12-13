@@ -7,6 +7,7 @@ import de.codingair.codingapi.particles.animations.movables.PlayerMid;
 import de.codingair.codingapi.tools.HitBox;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -122,7 +123,7 @@ public class AnimationPlayer {
                         }
                     }
 
-                    if (sounds && animation.getTickSound() != null && player != null) animation.getTickSound().play(player);
+                    if (sounds && animation.getTickSound() != null && player != null) SoundUtil.play(player, animation.getTickSound());
                     if (seconds == -1) return;
                 } else if (left == 0) {
                     if (!loop) {
@@ -141,7 +142,7 @@ public class AnimationPlayer {
                         }
                     }
 
-                    if (teleportSound && animation.getTeleportSound() != null && player != null) animation.getTeleportSound().play(player);
+                    if (teleportSound && animation.getTeleportSound() != null && player != null) SoundUtil.play(player, animation.getTeleportSound());
 
                     if (player == null || player.getActivePotionEffects().isEmpty()) setRunning(false);
                 } else {

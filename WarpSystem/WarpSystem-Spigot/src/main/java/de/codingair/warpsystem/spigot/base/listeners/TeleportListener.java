@@ -14,6 +14,9 @@ import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.Destinati
 import de.codingair.warpsystem.spigot.base.utils.teleport.destinations.adapters.EmptyAdapter;
 import de.codingair.warpsystem.spigot.base.utils.teleport.process.Teleport;
 import org.bukkit.Bukkit;
+import de.codingair.warpsystem.spigot.base.utils.SoundUtil;
+import de.codingair.codingapi.server.sounds.Sound;
+import de.codingair.codingapi.server.sounds.SoundData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 
 public class TeleportListener implements Listener {
     public static final HashMap<Player, org.bukkit.Location> TELEPORTS = new HashMap<>();
@@ -40,6 +44,14 @@ public class TeleportListener implements Listener {
         if (player != null && player.isOnline()) {
             //teleport
             org.bukkit.Location l = player.getLocation();
+            try {
+                // Play the teleport sound immediately to avoid perceived delay
+                if (!options.isSilent() && options.getTeleportSound() != null) {
+                    SoundUtil.play(player, options.getTeleportSound());
+                    // prevent duplicate play later: set a dummy SoundData with null sound so later getTeleportSound() returns this but it contains no Sound
+                    try { options.setTeleportSound(new SoundData(Sound.ENTITY_ITEM_BREAK, 0F, 1F)); } catch (Throwable ignored) { options.setTeleportSound(null); }
+                }
+            } catch (Throwable ignored) {}
             AsyncCatcher.runSync(WarpSystem.getInstance(), () -> WarpSystem.getInstance().getTeleportManager().teleport(player, options, true), l);
             return CompletableFuture.completedFuture(l);
         } else {
@@ -87,7 +99,7 @@ public class TeleportListener implements Listener {
 
                 if (l == null || l.getWorld() == null) {
                     String world = l instanceof Location ? ((Location) l).getWorldName() : null;
-                    Bukkit.getScheduler().runTaskLater(WarpSystem.getInstance(), () -> e.getPlayer().sendMessage(new String[] {" ", Lang.getPrefix() + "§4World " + (world == null ? "" : "'" + world + "' ") + "is missing. Please contact an admin!", " "}), 2L);
+                    Bukkit.getScheduler().runTaskLater(WarpSystem.getInstance(), () -> e.getPlayer().sendMessage(" ", Lang.getPrefix() + "§4World " + (world == null ? "" : "'" + world + "' ") + "is missing. Please contact an admin!", " "), 2L);
                     return;
                 }
 
@@ -107,7 +119,7 @@ public class TeleportListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(WarpSystem.getInstance(), () -> WarpSystem.getInstance().getTeleportManager().teleport(e.getPlayer(), options), 2L);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            ex.printStackTrace();
+            WarpSystem.getInstance().getLogger().log(Level.SEVERE, "Failed to prepare spawn location for player", ex);
         }
     }
 

@@ -280,7 +280,7 @@ public class PWEditor extends Editor<PlayerWarp> implements Ticker {
                         getBackup().applyTo(getClone());
 
                         SoundData sound = getSuccessSound();
-                        if (sound != null) sound.play(player);
+                        if (sound != null) de.codingair.warpsystem.spigot.base.utils.SoundUtil.play(player, sound);
 
                         String msg = getSuccessMessage();
                         if (msg != null) getPlayer().sendMessage(msg);

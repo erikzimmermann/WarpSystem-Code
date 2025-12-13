@@ -148,9 +148,9 @@ public class SoundPage extends PageItem {
 
                         soundData.play(p);
                     }
-                }
 
-                update();
+                    update();
+                }
             }
 
             @Override
@@ -199,6 +199,7 @@ public class SoundPage extends PageItem {
                 if (e.isLeftClick()) soundData.setVolume(Math.max(round(soundData.getVolume() - 0.1F), 0F));
                 else soundData.setVolume(Math.min(round(soundData.getVolume() + 0.1F), 1F));
 
+                de.codingair.warpsystem.spigot.base.WarpSystem.getInstance().getLogger().info("SoundPage: playing sound (volume change): " + (soundData.getSound() == null ? "null" : soundData.getSound().name()) + ", vol=" + soundData.getVolume() + ", pitch=" + soundData.getPitch());
                 soundData.play(player);
                 update();
             }
@@ -227,6 +228,7 @@ public class SoundPage extends PageItem {
                 if (e.isLeftClick()) soundData.setPitch(Math.max(round(soundData.getPitch() - 0.1F), 0F));
                 else soundData.setPitch(Math.min(round(soundData.getPitch() + 0.1F), 2F));
 
+                de.codingair.warpsystem.spigot.base.WarpSystem.getInstance().getLogger().info("SoundPage: playing sound (pitch change): " + (soundData.getSound() == null ? "null" : soundData.getSound().name()) + ", vol=" + soundData.getVolume() + ", pitch=" + soundData.getPitch());
                 soundData.play(player);
                 update();
             }
