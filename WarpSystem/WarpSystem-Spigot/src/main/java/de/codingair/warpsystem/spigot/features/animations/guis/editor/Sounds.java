@@ -38,7 +38,7 @@ public class Sounds extends HotbarGUI {
     }
 
     public void shiftNext(SoundData soundData) {
-        if(soundData == null || soundData.getSound() == null) return;
+        if (soundData == null || soundData.getSound() == null) return;
         Sound sound = soundData.getSound();
         for (int i = sound.ordinal(); true; i++) {
             if (i == sounds.length) i = 0;
