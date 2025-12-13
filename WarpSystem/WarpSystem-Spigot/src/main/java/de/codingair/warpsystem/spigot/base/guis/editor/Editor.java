@@ -149,7 +149,6 @@ public class Editor<C> extends SimpleGUI {
             public void onClick(InventoryClickEvent e, Player player) {
                 backup.cancel(clone);
                 if (getCancelSound() != null) {
-                    Sound s = getCancelSound().getSound();
                     SoundUtil.play(player, getCancelSound());
                 }
             }
