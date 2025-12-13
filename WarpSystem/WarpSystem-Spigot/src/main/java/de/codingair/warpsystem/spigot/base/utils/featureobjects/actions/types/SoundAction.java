@@ -25,8 +25,7 @@ public class SoundAction extends ActionObject<SoundData> {
             WarpSystem.getInstance().getLogger().warning("Tried to play a null SoundData in SoundAction.perform");
             return false;
         }
-        Sound s = getValue().getSound();
-        WarpSystem.getInstance().getLogger().info("Playing sound via SoundAction: " + (s == null ? "null" : s.name()) + ", vol=" + getValue().getVolume() + ", pitch=" + getValue().getPitch());
+        WarpSystem.getInstance().getLogger().info("Playing sound via SoundAction: " + (getValue().getSound() == null ? "null" : getValue().getSound().name()) + ", vol=" + getValue().getVolume() + ", pitch=" + getValue().getPitch());
         SoundUtil.play(player, getValue());
         return true;
     }
