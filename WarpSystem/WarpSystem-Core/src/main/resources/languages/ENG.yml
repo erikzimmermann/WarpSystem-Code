@@ -52,6 +52,8 @@ Move_Icon: 'Move icon'
 Success_Icon_Moved: '&aThe icon was moved successfully.'
 Name_Already_Exists: '&cThis name is not available.'
 Only_For_Players: '&cThis is only for players!'
+Use_Console: '&7/tp &e<playerA> &7[&e<playerB> &7| &e<x> <y> <z> &7] [&e<yaw> <pitch> &7] [&e<server> &7[&eworld&7] | &e<world> &7]'
+Relative_Coords_Console_Server_Only: '&cRelative coordinates (~) from console are only supported when the target player is on this server.'
 Use: Use
 Success_Files_Reloaded: '&aAll files are reloaded.'
 Success_Create_Category: '&aYou have created a &bcategory &asuccessfully.'

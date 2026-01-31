@@ -6,7 +6,7 @@
 
     <groupId>de.codingair</groupId>
     <artifactId>WarpSystem</artifactId>
-    <version>5.1.14_Hotfix-8</version>
+    <version>5.1.15-add-console-tp</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -27,7 +27,7 @@
     <repositories>
         <repository>
             <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.extendedclip.com/releases/</url>
         </repository>
         <repository>
             <id>jitpack.io</id>
@@ -131,7 +131,7 @@
             <dependency>
                 <groupId>me.clip</groupId>
                 <artifactId>placeholderapi</artifactId>
-                <version>2.11.6</version>
+                <version>2.11.7</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

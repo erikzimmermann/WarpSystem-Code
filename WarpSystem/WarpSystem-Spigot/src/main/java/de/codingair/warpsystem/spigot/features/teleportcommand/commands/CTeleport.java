@@ -14,11 +14,16 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.Location;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CTeleport extends WSCommandBuilder {
     public CTeleport() {
@@ -40,6 +45,9 @@ public class CTeleport extends WSCommandBuilder {
 
             @Override
             public boolean runCommand(CommandSender sender, String label, String[] args) {
+                if (!(sender instanceof Player)) {
+                    return runConsoleBranch(sender, label, args);
+                }
                 Player p = (Player) sender;
 
                 if (Permissions.hasPermission(p, Permissions.PERMISSION_USE_TELEPORT_COMMAND_TP)) {
@@ -109,10 +117,27 @@ public class CTeleport extends WSCommandBuilder {
 
                 return true;
             }
-        }.setOnlyPlayers(true), true);
+        }.setOnlyPlayers(false), true);
 
         setMergeSpaceArguments(false);
         setOwnTabCompleter((commandSender, command, s, args) -> {
+            if (commandSender instanceof ConsoleCommandSender) {
+                if (!Permissions.hasPermission(commandSender, Permissions.PERMISSION_USE_TELEPORT_COMMAND_TP)) return new ArrayList<>();
+                if (args.length <= 1) {
+                    String prefix = args.length == 1 ? args[0].toLowerCase() : "";
+                    List<String> names = WarpSystem.getInstance().getPlayerDataManager().getCached()
+                            .map(PlayerData::getName)
+                            .filter(n -> n.toLowerCase().startsWith(prefix))
+                            .collect(Collectors.toList());
+                    if (names.isEmpty() && Bukkit.getOnlinePlayers() != null) {
+                        for (Player o : Bukkit.getOnlinePlayers()) {
+                            if (o.getName().toLowerCase().startsWith(prefix)) names.add(o.getName());
+                        }
+                    }
+                    return names;
+                }
+                return TeleportCommandManager.handler().suggestTp(Arrays.copyOfRange(args, 1, args.length), new ArrayList<>());
+            }
             if (Permissions.hasPermission(commandSender, Permissions.PERMISSION_USE_TELEPORT_COMMAND_TP)) {
                 if (commandSender instanceof Player) {
                     Player p = (Player) commandSender;
@@ -136,6 +161,130 @@ public class CTeleport extends WSCommandBuilder {
             } else return new ArrayList<>();
 
         });
+    }
+
+    private static boolean runConsoleBranch(CommandSender sender, String label, String[] args) {
+        if (!Permissions.hasPermission(sender, Permissions.PERMISSION_USE_TELEPORT_COMMAND_TP)) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("No_Permission"));
+            return true;
+        }
+        if (args.length == 0) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("Use_Console"));
+            return true;
+        }
+        String targetName = args[0];
+        PlayerData playerAData = WarpSystem.getInstance().getPlayerDataManager().getCache(targetName);
+        if (playerAData == null) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("Player_is_not_online"));
+            return true;
+        }
+        if (args.length >= 2) {
+            String second = args[1];
+            if (second.length() > 1 || !second.equals("~")) {
+                PlayerData playerBData = WarpSystem.getInstance().getPlayerDataManager().getCache(second);
+                if (playerBData != null) {
+                    TeleportCommandManager.handler().tp(sender, playerAData, playerBData);
+                    return true;
+                }
+            }
+        }
+        Player base = Bukkit.getPlayer(targetName);
+        boolean hasTilde = Arrays.stream(args).anyMatch(a -> a != null && a.contains("~"));
+        if (hasTilde && base == null) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("Relative_Coords_Console_Server_Only"));
+            return true;
+        }
+        Location baseLocation = base != null ? base.getLocation() : null;
+        String[] argsRest = Arrays.copyOfRange(args, 1, args.length);
+        return processConsole(sender, playerAData, baseLocation, argsRest);
+    }
+
+    private static boolean processConsole(CommandSender sender, PlayerData targetData, Location base, String[] args) {
+        Double x = null, y = null, z = null;
+        int i = 0;
+        if (args.length - 1 >= i && base != null) {
+            x = parseDeep(args[i], base.getX());
+            if (x != null) {
+                if (args.length - 1 >= i + 1) {
+                    y = parseDeep(args[i + 1], base.getY());
+                    if (y == null) return false;
+                } else return false;
+                if (args.length - 1 >= i + 2) {
+                    z = parseDeep(args[i + 2], base.getZ());
+                    if (z == null) {
+                        x = null;
+                        y = null;
+                    }
+                } else {
+                    x = null;
+                    y = null;
+                }
+            }
+        }
+        return processConsole(sender, targetData, x, y, z, args);
+    }
+
+    private static boolean processConsole(CommandSender sender, PlayerData targetData, Double x, Double y, Double z, String[] args) {
+        int i = 0;
+        if (x != null) i += 3;
+        Float yaw = null, pitch = null;
+        Location base = baseForConsole(sender, targetData);
+        if (args.length - 1 >= i && base != null) {
+            yaw = parseDeep(args[i], base.getYaw());
+            if (yaw != null) {
+                if (yaw > 180) yaw = 180F;
+                else if (yaw < -180) yaw = -180F;
+                if (args.length - 1 >= i + 1) {
+                    pitch = parseDeep(args[i + 1], base.getPitch());
+                    if (pitch != null) {
+                        if (pitch > 90) pitch = 90F;
+                        else if (pitch < -90) pitch = -90F;
+                    } else return false;
+                } else return false;
+            }
+        }
+        return processConsole(sender, targetData, x, y, z, yaw, pitch, args);
+    }
+
+    private static Location baseForConsole(CommandSender sender, PlayerData targetData) {
+        Player p = Bukkit.getPlayer(targetData.getName());
+        return p != null ? p.getLocation() : null;
+    }
+
+    private static boolean processConsole(CommandSender sender, PlayerData targetData, Double x, Double y, Double z, Float yaw, Float pitch, String[] args) {
+        int i = 0;
+        if (x != null) i += 3;
+        if (yaw != null) i += 2;
+        String world = null, server = null;
+        if (args.length > i + 2) return false;
+        if (args.length - 1 >= i + 1) {
+            server = args[i];
+            world = args[i + 1];
+            boolean noServer = WarpSystem.getInstance().getServerManager().getProperties(server) == null;
+            boolean noWorld = !WarpSystem.getInstance().getServerManager().getWorlds(server).contains(world);
+            if (noServer && noWorld) {
+                sender.sendMessage(Lang.getPrefix() + Lang.get("Player_Server_Or_World_Not_Available"));
+                return true;
+            } else if (noServer) {
+                sender.sendMessage(Lang.getPrefix() + Lang.get("Server_Is_Not_Online"));
+                return true;
+            } else if (noWorld) {
+                sender.sendMessage(Lang.getPrefix() + Lang.get("World_Not_Exists"));
+                return true;
+            }
+        } else if (args.length - 1 >= i) {
+            String s = args[i];
+            if (WarpSystem.getInstance().getServerManager().getProperties(s) != null) server = s;
+            else {
+                World w = Bukkit.getWorld(s);
+                if (w != null) world = w.getName();
+                else {
+                    sender.sendMessage(Lang.getPrefix() + Lang.get("Player_Server_Or_World_Not_Available"));
+                    return true;
+                }
+            }
+        }
+        return TeleportCommandManager.handler().tp(sender, targetData, x, y, z, yaw, pitch, server, world);
     }
 
     private static boolean processTpTo(Player p, String[] args) {

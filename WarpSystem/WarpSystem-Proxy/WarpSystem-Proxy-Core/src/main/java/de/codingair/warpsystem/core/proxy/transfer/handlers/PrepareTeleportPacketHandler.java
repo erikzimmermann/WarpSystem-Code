@@ -64,14 +64,26 @@ public class PrepareTeleportPacketHandler implements ResponsibleMultiLayerPacket
             }
         } else {
             if (sender == null) {
-                //redis
+                //redis or console
                 PlayerData data = Core.getPlugin().getPlayerData().getCache(packet.getSender());
                 if (data != null) {
                     target = Core.getPlugin().getServer(data.getServer());
                     targetName = data.getName();
                 } else {
-                    target = null;
-                    targetName = null;
+                    // console: sender not in cache (e.g. "CONSOLE") - use recipient (player being teleported) to resolve target server
+                    PlayerData recipientData = Core.getPlugin().getPlayerData().getCache(packet.getRecipient());
+                    if (recipientData != null) {
+                        targetName = recipientData.getName();
+                        if (packet.getServer() != null) {
+                            target = Core.getPlugin().getServer(packet.getServer());
+                            if (target == null) return CompletableFuture.completedFuture(new LongPacket(PrepareTeleportPacket.Result.SERVER_NOT_ONLINE.ordinal()));
+                        } else {
+                            target = Core.getPlugin().getServer(recipientData.getServer());
+                        }
+                    } else {
+                        target = null;
+                        targetName = null;
+                    }
                 }
 
                 if (target == null) return CompletableFuture.completedFuture(new LongPacket(PrepareTeleportPacket.Result.PLAYER_NOT_ONLINE.ordinal()));

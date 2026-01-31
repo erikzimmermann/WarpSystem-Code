@@ -242,6 +242,123 @@ public class TeleportCommandHandler implements ITeleportCommandHandler {
         WarpSystem.getInstance().getTeleportManager().teleport(playerP, options);
     }
 
+    private static final String CONSOLE_SENDER = "CONSOLE";
+
+    @Override
+    public boolean tp(CommandSender sender, PlayerData player, @Nullable Double x, @Nullable Double y, @Nullable Double z, @Nullable Float yaw, @Nullable Float pitch, @Nullable String server, @Nullable String world) {
+        if (checkStatusTp(sender, player)) return true;
+        Player p = Bukkit.getPlayer(player.getName());
+
+        if (allNull(x, y, z, yaw, pitch, world, server)) return false;
+
+        boolean move = false;
+        if (server != null) {
+            if (server.equalsIgnoreCase(WarpSystem.getInstance().getCurrentServer())) {
+                if (allNull(x, y, z, yaw, pitch, world)) {
+                    sender.sendMessage(Lang.getPrefix() + Lang.get("Other_Is_Already_On_Target_Server").replace("%PLAYER%", player.getName()));
+                    return true;
+                } else server = null;
+            } else move = true;
+        }
+
+        if (p == null || move) {
+            WarpSystem.getDataHandler().send(new PrepareTeleportPacket(CONSOLE_SENDER, player.getName(), x, y, z, yaw, pitch, server, world), null).thenAccept(processTeleportResponseForConsole(sender, player.getName()));
+            return true;
+        }
+
+        if (TeleportCommandManager.getInstance().deniesForceTps(p)) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("Teleport_denied").replace("%PLAYER%", p.getName()));
+            return true;
+        }
+
+        StringBuilder destination = new StringBuilder();
+        World w;
+        if (world != null) {
+            w = Bukkit.getWorld(world);
+            if (w == null) {
+                sender.sendMessage(Lang.getPrefix() + Lang.get("World_Not_Exists"));
+                return true;
+            }
+            if (w.equals(p.getWorld()) && allNull(x, y, z, yaw, pitch) || !w.equals(p.getWorld())) destination.append(w.getName());
+        } else w = p.getWorld();
+
+        Location l = new Location(w, 0, 0, 0);
+        if (x != null && y != null && z != null) {
+            l.setX(x);
+            l.setY(y);
+            l.setZ(z);
+            if (destination.length() > 0) destination.append(", ");
+            destination.append("x: ").append(cut(x)).append(", y: ").append(cut(y)).append(", z: ").append(cut(z));
+        } else if (yaw != null && pitch != null) {
+            l = p.getLocation(l);
+            l.setWorld(w);
+        } else l = w.getSpawnLocation();
+
+        if (yaw != null && pitch != null) {
+            l.setYaw(yaw);
+            l.setPitch(pitch);
+            if (destination.length() > 0) destination.append(", ");
+            destination.append("yaw: ").append(cut(yaw)).append(", pitch: ").append(cut(pitch));
+        } else {
+            l.setYaw(p.getLocation().getYaw());
+            l.setPitch(p.getLocation().getPitch());
+        }
+
+        sender.sendMessage(Lang.getPrefix() + Lang.get("Teleported_Player_Info").replace("%player%", p.getName()).replace("%warp%", destination.toString()));
+        TeleportOptions options = new TeleportOptions(new Destination(new LocationAdapter(l)), destination.toString(), Origin.TeleportCommand);
+        options.setSkip(true);
+        options.setMessage(Lang.getPrefix() + Lang.get("Teleported_To_By").replace("%gate%", "Console"));
+
+        WarpSystem.getInstance().getTeleportManager().teleport(p, options);
+        return true;
+    }
+
+    @Override
+    public void tp(CommandSender sender, PlayerData player, PlayerData target) {
+        if (checkStatusTp(sender, player)) return;
+        if (checkStatusTp(sender, target)) return;
+
+        Player playerP = Bukkit.getPlayer(player.getName());
+        Player targetP = Bukkit.getPlayer(target.getName());
+
+        if (playerP == null || targetP == null) {
+            if (WarpSystem.getInstance().isProxyConnected() && TeleportCommandManager.getInstance().isProxy()) {
+                WarpSystem.getDataHandler().send(new PrepareTeleportPacket(CONSOLE_SENDER, player.getName(), target.getName()), null).thenAccept(processTeleportResponseForConsole(sender, player.getName()));
+            } else sender.sendMessage(Lang.getPrefix() + Lang.get("Player_is_not_online"));
+            return;
+        }
+
+        if (TeleportCommandManager.getInstance().deniesForceTps(playerP)) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("Teleport_denied").replace("%PLAYER%", playerP.getName()));
+            return;
+        }
+
+        sender.sendMessage(Lang.getPrefix() + Lang.get("Teleported_Player_Info").replace("%player%", playerP.getName()).replace("%warp%", targetP.getName()));
+
+        TeleportOptions options = new TeleportOptions(new Destination(new LocationAdapter(targetP.getLocation())), targetP.getName(), Origin.TeleportCommand);
+        options.setSkip(true);
+        options.setMessage(Lang.getPrefix() + Lang.get("Teleported_To_By").replace("%gate%", "Console"));
+
+        WarpSystem.getInstance().getTeleportManager().teleport(playerP, options);
+    }
+
+    private Consumer<LongPacket> processTeleportResponseForConsole(CommandSender sender, String playerName) {
+        return packet -> {
+            PrepareTeleportPacket.Result r = PrepareTeleportPacket.Result.values()[(int) packet.a()];
+            if (r == PrepareTeleportPacket.Result.PLAYER_NOT_ONLINE) sender.sendMessage(Lang.getPrefix() + Lang.get("Player_is_not_online"));
+            else if (r == PrepareTeleportPacket.Result.TELEPORT_DENIED) sender.sendMessage(Lang.getPrefix() + Lang.get("Teleport_denied").replace("%PLAYER%", playerName));
+            else if (r == PrepareTeleportPacket.Result.SERVER_NOT_ONLINE) sender.sendMessage(Lang.getPrefix() + Lang.get("Server_Is_Not_Online"));
+        };
+    }
+
+    private boolean checkStatusTp(CommandSender sender, PlayerData data) {
+        if (isOffline(data)) {
+            sender.sendMessage(Lang.getPrefix() + Lang.get("Player_is_not_online"));
+            return true;
+        }
+        return false;
+    }
+
     @NotNull
     private Consumer<LongPacket> processTeleportResponse(Player gate, String player) {
         return packet -> {
