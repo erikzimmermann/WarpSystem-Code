@@ -88,6 +88,11 @@ public class TeleportCommandHandler implements ITeleportCommandHandler {
 
     @Override
     public boolean tp(Player gate, PlayerData player, @Nullable Double x, @Nullable Double y, @Nullable Double z, @Nullable Float yaw, @Nullable Float pitch, @Nullable String server, @Nullable String world) {
+        return tp(gate, player, x, y, z, yaw, pitch, server, world, true);
+    }
+
+    @Override
+    public boolean tp(Player gate, PlayerData player, @Nullable Double x, @Nullable Double y, @Nullable Double z, @Nullable Float yaw, @Nullable Float pitch, @Nullable String server, @Nullable String world, boolean notifyPlayer) {
         if (checkStatusTp(gate, player)) return true;
         Player p = Bukkit.getPlayer(player.getName());
         if(p == null) return false;
@@ -147,6 +152,7 @@ public class TeleportCommandHandler implements ITeleportCommandHandler {
         TeleportOptions options = new TeleportOptions(new Destination(new LocationAdapter(l)), destination.toString(), Origin.TeleportCommand);
         options.setSkip(true);
         options.setMessage(Lang.getPrefix() + (gate == p ? Lang.get("Teleported_To") : Lang.get("Teleported_To_By").replace("%gate%", gate.getName())));
+        options.setNotifyPlayer(notifyPlayer);
 
         WarpSystem.getInstance().getTeleportManager().teleport(p, options);
         return true;
@@ -154,6 +160,11 @@ public class TeleportCommandHandler implements ITeleportCommandHandler {
 
     @Override
     public void tp(Player gate, PlayerData player, PlayerData target) {
+        tp(gate, player, target, true);
+    }
+
+    @Override
+    public void tp(Player gate, PlayerData player, PlayerData target, boolean notifyPlayer) {
         if (checkStatusTp(gate, player)) return;
         if (checkStatusTp(gate, target)) return;
 
@@ -175,6 +186,7 @@ public class TeleportCommandHandler implements ITeleportCommandHandler {
         TeleportOptions options = new TeleportOptions(new Destination(new LocationAdapter(targetP.getLocation())), targetP.getName(), Origin.TeleportCommand);
         options.setSkip(true);
         options.setMessage(Lang.getPrefix() + (gate == playerP ? Lang.get("Teleported_To") : Lang.get("Teleported_To_By").replace("%gate%", gate.getName())));
+        options.setNotifyPlayer(notifyPlayer);
 
         WarpSystem.getInstance().getTeleportManager().teleport(playerP, options);
     }

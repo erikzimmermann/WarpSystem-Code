@@ -6,7 +6,7 @@
 
     <groupId>de.codingair</groupId>
     <artifactId>WarpSystem</artifactId>
-    <version>5.1.14_Hotfix-8</version>
+    <version>5.1.16-silent-tp-command</version>
     <packaging>pom</packaging>
 
     <properties>

@@ -48,61 +48,68 @@ public class PlayerTeleport extends TeleportStage {
         String finalMessage = message;
 
         if (options.getOriginalDestination().usesBukkitTeleportation()) {
-            Bukkit.getPluginManager().registerEvents(listener = new Listener() {
-                @EventHandler (priority = EventPriority.MONITOR)
-                public void onTeleport(PlayerTeleportEvent e) {
-                    if (player.equals(e.getPlayer())) {
-                        afterEffectPosition.setValue(e.getTo());
+            org.bukkit.plugin.Plugin plugin = WarpSystem.getInstance();
+            if (plugin != null) {
+                Bukkit.getPluginManager().registerEvents(listener = new Listener() {
+                    @EventHandler (priority = EventPriority.MONITOR)
+                    public void onTeleport(PlayerTeleportEvent e) {
+                        if (player.equals(e.getPlayer())) {
+                            afterEffectPosition.setValue(e.getTo());
 
-                        if (e.isCancelled()) {
-                            String[] text = new String[2];
-                            String msg = Lang.get("Teleporting_Info");
+                            if (e.isCancelled()) {
+                                String[] text = new String[2];
+                                String msg = Lang.get("Teleporting_Info");
 
-                            if (d == TeleportDelay.Display.TITLE) {
-                                int i = msg.indexOf("\n");
-                                if (i != -1) {
-                                    text[0] = msg.substring(0, i);
-                                    text[1] = msg.substring(i + 2);
-                                } else text[0] = msg;
-                            }
-
-                            if (d == TeleportDelay.Display.ACTION_BAR) MessageAPI.sendActionBar(player, Lang.get("Teleport_Cancelled"));
-                            else if (d == TeleportDelay.Display.TITLE) MessageAPI.sendTitle(player, text[0], text[1], 2, 10, 2);
-                            HandlerList.unregisterAll(this);
-
-                            cancel(Result.CANCELLED);
-                        } else if (Version.atMost(8))
-                            Bukkit.getPluginManager().callEvent(new PlayerTeleportAcceptEvent(e.getPlayer())); //1.8 doesn't provide a packet based PlayerTeleportAcceptEvent
-                        else {
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    Bukkit.getPluginManager().callEvent(new PlayerTeleportAcceptEvent(player));
+                                if (d == TeleportDelay.Display.TITLE) {
+                                    int i = msg.indexOf("\n");
+                                    if (i != -1) {
+                                        text[0] = msg.substring(0, i);
+                                        text[1] = msg.substring(i + 2);
+                                    } else text[0] = msg;
                                 }
-                            }.runTaskLater(WarpSystem.getInstance(), 5); //safety timeout (PlayerTeleportAcceptEvent doesn't get triggered while spawning)
+
+                                if (d == TeleportDelay.Display.ACTION_BAR) MessageAPI.sendActionBar(player, Lang.get("Teleport_Cancelled"));
+                                else if (d == TeleportDelay.Display.TITLE) MessageAPI.sendTitle(player, text[0], text[1], 2, 10, 2);
+                                HandlerList.unregisterAll(this);
+
+                                cancel(Result.CANCELLED);
+                            } else if (Version.atMost(8))
+                                Bukkit.getPluginManager().callEvent(new PlayerTeleportAcceptEvent(e.getPlayer())); //1.8 doesn't provide a packet based PlayerTeleportAcceptEvent
+                            else {
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        Bukkit.getPluginManager().callEvent(new PlayerTeleportAcceptEvent(player));
+                                    }
+                                }.runTaskLater(plugin, 5); //safety timeout (PlayerTeleportAcceptEvent doesn't get triggered while spawning)
+                            }
                         }
                     }
-                }
 
-                @EventHandler
-                public void onTeleported(PlayerTeleportAcceptEvent e) {
-                    if (player.equals(e.getPlayer())) {
-                        if (player.isOnline()) {
-                            options.getOriginalDestination().sendMessage(player, finalMessage, options.getDisplayName(), options.getCosts(player), options.getOriginalOrigin());
-                            if (options.getTeleportSound() != null) options.getTeleportSound().play(player);
-                            end();
+                    @EventHandler
+                    public void onTeleported(PlayerTeleportAcceptEvent e) {
+                        if (player.equals(e.getPlayer())) {
+                            if (player.isOnline()) {
+                                if (options.isNotifyPlayer()) {
+                                    options.getOriginalDestination().sendMessage(player, finalMessage, options.getDisplayName(), options.getCosts(player), options.getOriginalOrigin());
+                                } else {
+                                    Bukkit.getLogger().info("[WarpSystem] Silent TP: " + player.getName() + " -> " + (options.getDisplayName() != null ? options.getDisplayName() : "destination"));
+                                }
+                                if (options.getTeleportSound() != null) options.getTeleportSound().play(player);
+                                end();
+                            }
                         }
                     }
-                }
 
-                @EventHandler
-                public void onQuit(PlayerQuitEvent e) {
-                    if (player.equals(e.getPlayer())) {
-                        HandlerList.unregisterAll(this);
-                        cancel(Result.DISCONNECT);
+                    @EventHandler
+                    public void onQuit(PlayerQuitEvent e) {
+                        if (player.equals(e.getPlayer())) {
+                            HandlerList.unregisterAll(this);
+                            cancel(Result.DISCONNECT);
+                        }
                     }
-                }
-            }, WarpSystem.getInstance());
+                }, plugin);
+            }
         }
 
         options.getOriginalDestination().teleport(player, message, options.getDisplayName(), options.getPermission() == null, options.isSilent(), options.getCosts(player), new Callback<Result>() {

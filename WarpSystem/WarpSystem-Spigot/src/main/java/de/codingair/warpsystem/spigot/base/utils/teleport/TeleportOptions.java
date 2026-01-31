@@ -40,6 +40,7 @@ public class TeleportOptions implements Options {
     private boolean waitForTeleport; //Waiting for walking teleports
     private boolean confirmPayment = true;
     private boolean silent;
+    private boolean notifyPlayer = true;
 
     private String payMessage;
     private String paymentDeniedMessage;
@@ -223,6 +224,14 @@ public class TeleportOptions implements Options {
 
     public void setSilent(boolean silent) {
         this.silent = silent;
+    }
+
+    public boolean isNotifyPlayer() {
+        return notifyPlayer;
+    }
+
+    public void setNotifyPlayer(boolean notifyPlayer) {
+        this.notifyPlayer = notifyPlayer;
     }
 
     public SoundData getTeleportSound() {
