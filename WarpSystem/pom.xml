@@ -6,7 +6,7 @@
 
     <groupId>de.codingair</groupId>
     <artifactId>WarpSystem</artifactId>
-    <version>5.1.14_Hotfix-8</version>
+    <version>5.1.14_Hotfix-9</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>com.github.CodingAir</groupId>
                 <artifactId>CodingAPI</artifactId>
-                <version>1.100</version>
+                <version>1.101</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
