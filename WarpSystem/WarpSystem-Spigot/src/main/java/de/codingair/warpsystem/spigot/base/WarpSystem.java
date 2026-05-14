@@ -187,6 +187,12 @@ public class WarpSystem extends JavaPlugin implements Proxy {
             oldVersion = config.getConfig().getString("Do_Not_Edit.Last_Version", "0");
             checkBackup(config, loadingFailed);
 
+            String currentVersion = getDescription().getVersion();
+            if (!currentVersion.equals(oldVersion)) {
+                config.getConfig().set("Do_Not_Edit.Last_Version", currentVersion);
+                config.saveConfig();
+            }
+
             Bukkit.getPluginManager().registerEvents(new PlayerDataListener(), this);
             Bukkit.getPluginManager().registerEvents(new TeleportListener(), this);
             Bukkit.getPluginManager().registerEvents(new NotifyListener(), this);

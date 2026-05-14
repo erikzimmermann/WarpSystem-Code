@@ -1,6 +1,5 @@
 package de.codingair.warpsystem.spigot.base.utils;
 
-import de.codingair.codingapi.files.ConfigFile;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -33,11 +32,6 @@ public class Notifier {
                 player.sendMessage("");
             }
 
-            ConfigFile file = WarpSystem.getInstance().getFileManager().getFile("Config");
-            if (!file.getConfig().getString("Do_Not_Edit.Last_Version", "").equals(WarpSystem.getInstance().getDescription().getVersion())) {
-                file.getConfig().set("Do_Not_Edit.Last_Version", WarpSystem.getInstance().getDescription().getVersion());
-                file.saveConfig();
-            }
         }
     }
 }
