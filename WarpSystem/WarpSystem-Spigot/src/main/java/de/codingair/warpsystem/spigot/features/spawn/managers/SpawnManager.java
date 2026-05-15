@@ -5,6 +5,7 @@ import de.codingair.codingapi.tools.io.ConfigMask;
 import de.codingair.warpsystem.core.transfer.packets.general.SendGlobalSpawnOptionsPacket;
 import de.codingair.warpsystem.core.utils.Manager;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
+import de.codingair.warpsystem.spigot.base.listeners.SpawnLocationEvents;
 import de.codingair.warpsystem.spigot.base.setupassistant.annotations.AvailableForSetupAssistant;
 import de.codingair.warpsystem.spigot.base.setupassistant.annotations.Function;
 import de.codingair.warpsystem.spigot.base.utils.featureobjects.actions.types.WarpAction;
@@ -20,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 
 import java.io.File;
 import java.util.Objects;
@@ -55,6 +57,7 @@ public class SpawnManager implements Manager {
 
         SpawnListener listener = new SpawnListener();
         Bukkit.getPluginManager().registerEvents(listener, WarpSystem.getInstance());
+        SpawnLocationEvents.register(listener, WarpSystem.getInstance(), EventPriority.HIGH, false, listener::onSpawn);
 
         new CSetSpawn().register();
         new CSpawn().register();

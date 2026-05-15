@@ -13,6 +13,7 @@ import de.codingair.warpsystem.core.transfer.packets.spigot.QueueRTPUsagePacket;
 import de.codingair.warpsystem.core.transfer.packets.spigot.RandomTPWorldsPacket;
 import de.codingair.warpsystem.core.utils.Manager;
 import de.codingair.warpsystem.spigot.base.WarpSystem;
+import de.codingair.warpsystem.spigot.base.listeners.SpawnLocationEvents;
 import de.codingair.warpsystem.spigot.base.setupassistant.annotations.AvailableForSetupAssistant;
 import de.codingair.warpsystem.spigot.base.setupassistant.annotations.Function;
 import de.codingair.warpsystem.spigot.base.utils.Lang;
@@ -39,6 +40,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
@@ -168,6 +170,7 @@ public abstract class RandomTeleportManager implements Manager, ProxyFeature {
 
         SpawnListener listener = new SpawnListener();
         Bukkit.getPluginManager().registerEvents(listener, WarpSystem.getInstance());
+        SpawnLocationEvents.register(listener, WarpSystem.getInstance(), EventPriority.HIGHEST, false, listener::onSpawn);
         WarpSystem.getDataHandler().registerHandler(QueueRTPUsagePacket.class, new QueueRTPUsagePacketHandler());
 
         boolean success = true;

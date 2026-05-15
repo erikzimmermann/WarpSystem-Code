@@ -75,7 +75,6 @@ public class TeleportListener implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(PlayerSpawnLocationEvent e) {
         try {
             TeleportData data = teleport.getIfPresent(e.getPlayer().getName().toLowerCase());
