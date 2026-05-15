@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class TeleportManager implements ITeleportManager {
     public static final String NO_PERMISSION = "%NO_PERMISSION%";
@@ -174,7 +175,11 @@ public class TeleportManager implements ITeleportManager {
         SimpleWarpManager man = SimpleWarpManager.getInstance();
         if (man == null) return Collections.emptySet();
 
-        return Collections.unmodifiableSet(man.getWarps().keySet());
+        return Collections.unmodifiableSet(
+                man.getWarps().values().stream()
+                        .map(warp -> warp.getName(true))
+                        .collect(Collectors.toSet())
+        );
     }
 
     @Override
