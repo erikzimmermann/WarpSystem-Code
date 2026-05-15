@@ -87,7 +87,7 @@ public class Teleport {
         options.fireCallbacks(result);
 
         if (result == Result.NOT_ENOUGH_MONEY) {
-            player.sendMessage(Lang.getPrefix() + Lang.get("Not_enough_Money").replace("%AMOUNT%", options.getFinalCosts(player).toString()));
+            player.sendMessage(Lang.getPrefix() + Lang.get("Not_Enough_Money").replace("%AMOUNT%", options.getFinalCosts(player).toString()));
         }
 
         if (result == Result.TARGET_SERVER_IS_FULL) {

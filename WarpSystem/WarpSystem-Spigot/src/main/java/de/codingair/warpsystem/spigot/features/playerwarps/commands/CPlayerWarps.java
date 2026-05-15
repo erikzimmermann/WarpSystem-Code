@@ -395,7 +395,7 @@ public class CPlayerWarps extends WarpSystemCommandBuilder {
             Number paid = PWEditor.calculateCosts(true, w, w);
 
             if (!PWEditor.canPay(player, paid.doubleValue())) {
-                player.sendMessage(Lang.getPrefix() + Lang.get("Not_enough_Money").replace("%AMOUNT%", new ImprovedDouble(paid.doubleValue()).toString()));
+                player.sendMessage(Lang.getPrefix() + Lang.get("Not_Enough_Money").replace("%AMOUNT%", new ImprovedDouble(paid.doubleValue()).toString()));
                 return;
             } else Bank.withdraw(player, paid.doubleValue());
 
